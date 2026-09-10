@@ -230,9 +230,9 @@ User Submission
 | **Total** | **100 pts** | |
 
 **Grade bands:**
-- 🟢 ≥ 70 — Excellent
-- 🟡 50–69 — Needs Improvement  
-- 🔴 < 50 — Needs Work
+- [Excellent] >= 70
+- [Needs Improvement] 50-69
+- [Needs Work] < 50
 
 ---
 
@@ -240,11 +240,11 @@ User Submission
 
 | # | Problem | Difficulty | Key Concepts |
 |---|---|---|---|
-| 1 | Parking Lot System | 🟢 Easy | OOP basics, state management |
-| 2 | Library Management System | 🟡 Medium | Associations, borrowing logic |
-| 3 | Vending Machine | 🟡 Medium | State pattern, transaction flow |
-| 4 | Elevator System | 🔴 Hard | Scheduling, observer pattern |
-| 5 | Chess Game | 🔴 Hard | Polymorphism, move validation |
+| 1 | Splitwise | Hard | Strategy Pattern, Debt Simplification, Greedy |
+| 2 | Parking Lot | Medium | Multi-floor Management, Spot Strategies, Ticket Lifecycle |
+| 3 | Library Management System | Medium | BookItem Inventory, Reservation Queues, Overdue Fines |
+| 4 | Vending Machine | Easy | State Machine Pattern, Inventory, Change Calculation |
+| 5 | Snake and Ladder | Easy | Board Coordinates, Injectable Dice, Turn Engine |
 
 ---
 
