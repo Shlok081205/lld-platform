@@ -50,6 +50,7 @@ body {
   font-size: 0.85rem;
   color: #374151;
   margin-bottom: 0.4rem;
+  display: block;
 }
 
 .help-text {
@@ -99,11 +100,6 @@ body {
 
     <!-- Card Header -->
     <div class="auth-card-header">
-      <div class="d-flex justify-content-center mb-3">
-        <div class="rounded-3 p-3" style="background:rgba(168,85,247,0.3);">
-          <i class="bi bi-person-plus text-white" style="font-size:1.75rem;"></i>
-        </div>
-      </div>
       <h4 class="text-white fw-bold mb-1">Create Account</h4>
       <p class="text-white-50 small mb-0">Join and start practicing LLD today</p>
     </div>
@@ -113,7 +109,6 @@ body {
 
       {% if form.non_field_errors %}
       <div class="alert alert-danger rounded-3 small" role="alert">
-        <i class="bi bi-x-circle-fill me-2"></i>
         {% for error in form.non_field_errors %}{{ error }}{% endfor %}
       </div>
       {% endif %}
@@ -124,10 +119,6 @@ body {
         {% for field in form %}
         <div class="mb-3">
           <label class="form-label" for="{{ field.id_for_label }}">
-            {% if field.name == 'username' %}<i class="bi bi-person me-1 text-muted"></i>
-            {% elif 'password' in field.name %}<i class="bi bi-lock me-1 text-muted"></i>
-            {% else %}<i class="bi bi-input-cursor-text me-1 text-muted"></i>
-            {% endif %}
             {{ field.label }}
           </label>
           <input
@@ -163,7 +154,7 @@ body {
 
         <!-- Submit -->
         <button type="submit" class="btn-register btn mt-2 mb-3">
-          <i class="bi bi-person-check me-2"></i>Create Account
+          Create Account
         </button>
 
       </form>
@@ -172,7 +163,7 @@ body {
 
       <div class="text-center">
         <a href="{% url 'login' %}" class="btn btn-outline-dark rounded-pill px-4 fw-semibold">
-          <i class="bi bi-box-arrow-in-right me-2"></i>Login Instead
+          Login Instead
         </a>
       </div>
 

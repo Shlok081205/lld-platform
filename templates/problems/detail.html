@@ -27,16 +27,6 @@
   border: 1px solid rgba(0,0,0,0.08);
 }
 
-.section-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
 .sample-input {
   background-color: #1a1a2e;
   color: #a8b2d1;
@@ -83,7 +73,6 @@
       </div>
       <h1 class="fw-bold text-white mb-1" style="font-size:1.75rem;">{{ problem.title }}</h1>
       <p class="text-white-50 mb-0 small">
-        <i class="bi bi-lightning-charge-fill text-warning me-1"></i>
         {{ user_attempts|length }} past attempt{{ user_attempts|length|pluralize }} by you
       </p>
     </div>
@@ -91,7 +80,7 @@
       href="{% url 'attempts:submit' slug=problem.slug %}"
       class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold align-self-start"
     >
-      <i class="bi bi-play-fill me-2"></i>Start Attempt
+      Start Attempt
     </a>
   </div>
 </div>
@@ -104,12 +93,7 @@
     <!-- Description -->
     <div class="card section-card mb-4">
       <div class="card-body p-4">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="section-icon bg-primary bg-opacity-10 text-primary">
-            <i class="bi bi-file-text"></i>
-          </div>
-          <h5 class="fw-bold mb-0">Description</h5>
-        </div>
+        <h5 class="fw-bold mb-3 text-dark">Description</h5>
         <p class="text-muted mb-0" style="line-height:1.75;font-size:0.95rem;">
           {{ problem.description|linebreaksbr }}
         </p>
@@ -119,12 +103,7 @@
     <!-- Requirements -->
     <div class="card section-card mb-4">
       <div class="card-body p-4">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="section-icon bg-success bg-opacity-10 text-success">
-            <i class="bi bi-check2-square"></i>
-          </div>
-          <h5 class="fw-bold mb-0">Requirements &amp; Constraints</h5>
-        </div>
+        <h5 class="fw-bold mb-3 text-dark">Requirements &amp; Constraints</h5>
         <div class="text-muted" style="line-height:1.75;font-size:0.95rem;">
           {{ problem.requirements|linebreaksbr }}
         </div>
@@ -135,12 +114,7 @@
     {% if problem.sample_input %}
     <div class="card section-card mb-4">
       <div class="card-body p-4">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="section-icon bg-warning bg-opacity-10 text-warning">
-            <i class="bi bi-terminal"></i>
-          </div>
-          <h5 class="fw-bold mb-0">Sample Usage / Interface Hint</h5>
-        </div>
+        <h5 class="fw-bold mb-3 text-dark">Sample Usage / Interface Hint</h5>
         <pre class="sample-input mb-0"><code>{{ problem.sample_input }}</code></pre>
       </div>
     </div>
@@ -152,7 +126,7 @@
         href="{% url 'attempts:submit' slug=problem.slug %}"
         class="btn btn-dark btn-lg rounded-3 fw-semibold"
       >
-        <i class="bi bi-play-fill me-2 text-danger"></i>Start Attempt
+        Start Attempt
       </a>
     </div>
 
@@ -178,7 +152,7 @@
         </div>
         <div class="d-flex justify-content-between align-items-center py-2">
           <span class="small text-muted">AI Evaluator</span>
-          <span class="small fw-semibold text-primary">Gemini 1.5 Flash</span>
+          <span class="small fw-semibold text-primary">Gemini 3.6 Flash</span>
         </div>
       </div>
     </div>
@@ -242,8 +216,7 @@
         </div>
         {% else %}
         <div class="text-center py-3">
-          <i class="bi bi-journal-x text-muted" style="font-size:1.75rem;"></i>
-          <p class="text-muted small mt-2 mb-0">No attempts yet. Give it a try!</p>
+          <p class="text-muted small mb-0">No attempts yet. Give it a try!</p>
         </div>
         {% endif %}
       </div>
