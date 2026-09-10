@@ -73,7 +73,7 @@ class TestCodeExecutor:
     def test_wrong_code_fails_tests(self):
         wrong_code = '''
 def add(a, b):
-    return a - b  # wrong implementation
+    return -999  # wrong implementation for all cases
 '''
         result = self.executor.run(wrong_code, SIMPLE_TEST_HARNESS)
         assert result.passed == 0

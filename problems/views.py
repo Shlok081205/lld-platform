@@ -1,23 +1,25 @@
-﻿from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Problem
 
 
 def problem_list(request):
-    difficulty = request.GET.get('difficulty', '')
+    difficulty = request.GET.get('difficulty', '').strip()
     problems = Problem.objects.filter(is_active=True)
-    if difficulty in ['Easy', 'Medium', 'Hard']:
-        problems = problems.filter(difficulty=difficulty)
+    
+    if difficulty:
+        diff_cap = difficulty.capitalize()
+        if diff_cap in ['Easy', 'Medium', 'Hard']:
+            problems = problems.filter(difficulty=diff_cap)
+            difficulty = diff_cap
 
-    problems_with_counts = []
-    for problem in problems:
-        problems_with_counts.append({
-            'problem': problem,
-            'attempt_count': problem.attempt_count_for_user(request.user),
-        })
+    problem_items = []
+    for p in problems:
+        p.user_attempt_count = p.attempt_count_for_user(request.user)
+        problem_items.append(p)
 
     return render(request, 'problems/list.html', {
-        'problems': problems_with_counts,
+        'problems': problem_items,
         'selected_difficulty': difficulty,
     })
 

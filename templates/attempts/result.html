@@ -1,144 +1,91 @@
 {% extends "base.html" %}
 
-{% block title %}Result — {{ attempt.problem.title }} — LLD Practice Platform{% endblock %}
+{% block title %}Result: {{ attempt.problem.title }} — LLD Practice Platform{% endblock %}
 
 {% block extra_style %}
-/* ── Score Circle ── */
+.result-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  border-radius: 16px;
+  padding: 2.25rem 2rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+
 .score-circle-wrap {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .score-circle {
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 6px solid;
   font-weight: 800;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  border: 4px solid rgba(255,255,255,0.25);
 }
 
-.score-circle .score-number {
-  font-size: 2.4rem;
-  line-height: 1;
-}
+.score-green  { background: linear-gradient(135deg, #198754, #157347); color: #fff; }
+.score-yellow { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #212529; }
+.score-red    { background: linear-gradient(135deg, #dc3545, #b02a37); color: #fff; }
 
-.score-circle .score-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
+.score-number { font-size: 2.2rem; line-height: 1; }
+.score-label  { font-size: 0.75rem; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
 
-.score-green  { border-color: #198754; color: #198754; background: rgba(25, 135, 84, 0.08); }
-.score-yellow { border-color: #fd7e14; color: #fd7e14; background: rgba(253, 126, 20, 0.08); }
-.score-red    { border-color: #dc3545; color: #dc3545; background: rgba(220, 53, 69, 0.08); }
-
-/* ── Result Hero ── */
-.result-hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  color: white;
-}
-
-/* ── Breakdown cards ── */
 .breakdown-card {
   border-radius: 14px !important;
-  border: none !important;
+  border: 1px solid rgba(0,0,0,0.08);
   overflow: hidden;
+  height: 100%;
 }
 
-.breakdown-card .card-header {
-  border-bottom: none;
-  padding: 1rem 1.25rem 0.75rem;
-}
-
-/* ── Rubric table ── */
 .rubric-table th {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #6c757d;
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.rubric-table td {
-  font-size: 0.85rem;
-  vertical-align: middle;
-}
+.criterion-name { font-weight: 600; font-size: 0.9rem; color: #1f2937; }
+.evidence-text  { font-size: 0.84rem; color: #374151; }
+.concern-text   { font-size: 0.84rem; color: #dc2626; }
+.suggestion-text { font-size: 0.84rem; color: #2563eb; }
 
-.rubric-table .criterion-name {
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.criterion-progress {
-  height: 8px;
-  border-radius: 20px;
-}
-
-.evidence-text {
-  font-size: 0.78rem;
-  color: #4b5563;
-  max-width: 240px;
-}
-
-.concern-text {
-  font-size: 0.78rem;
-  color: #dc3545;
-  max-width: 180px;
-}
-
-.suggestion-text {
-  font-size: 0.78rem;
-  color: #6366f1;
-  font-style: italic;
-  max-width: 200px;
-}
-
-/* ── Output ── */
-pre.exec-output {
-  background: #1a1a2e;
-  color: #a9dc76;
-  border-radius: 10px;
-  padding: 1.25rem;
-  font-size: 0.82rem;
-  max-height: 300px;
-  overflow-y: auto;
-  border: none;
-}
-
-/* ── AI Summary ── */
 .ai-summary-card {
-  background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(168,85,247,0.06) 100%);
-  border: 1px solid rgba(99,102,241,0.2) !important;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border: 1px solid #ddd6fe !important;
   border-radius: 14px !important;
+}
+
+.exec-output {
+  background-color: #1a1a2e;
+  color: #5eead4;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Consolas', 'Fira Code', monospace;
+  font-size: 0.83rem;
+  max-height: 350px;
+  overflow-y: auto;
 }
 {% endblock %}
 
 {% block content %}
 
-<!-- ── Breadcrumb ── -->
+<!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb small">
-    <li class="breadcrumb-item"><a href="{% url 'problem-list' %}" class="text-decoration-none">Problems</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'problem-detail' attempt.problem.pk %}" class="text-decoration-none">{{ attempt.problem.title|truncatechars:28 }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'problems:list' %}" class="text-decoration-none">Problems</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'problems:detail' slug=attempt.problem.slug %}" class="text-decoration-none">{{ attempt.problem.title|truncatechars:28 }}</a></li>
     <li class="breadcrumb-item active">Result</li>
   </ol>
 </nav>
 
-<!-- ── Result Hero ── -->
+<!-- Result Hero -->
 <div class="result-hero">
   <div class="row align-items-center g-4">
 
@@ -146,21 +93,21 @@ pre.exec-output {
     <div class="col-12 col-md-auto text-center">
       <div class="score-circle-wrap">
         <div class="score-circle
-          {% if attempt.overall_score >= 70 %}score-green
-          {% elif attempt.overall_score >= 50 %}score-yellow
+          {% if evaluation.overall_score >= 70 %}score-green
+          {% elif evaluation.overall_score >= 50 %}score-yellow
           {% else %}score-red{% endif %}
         ">
-          <span class="score-number">{{ attempt.overall_score }}</span>
+          <span class="score-number">{{ evaluation.overall_score|default:0 }}</span>
           <span class="score-label">/ 100</span>
         </div>
         <div class="mt-2">
           <span class="badge rounded-pill px-3 py-2 fw-semibold
-            {% if attempt.overall_score >= 70 %}bg-success
-            {% elif attempt.overall_score >= 50 %}bg-warning text-dark
+            {% if evaluation.overall_score >= 70 %}bg-success
+            {% elif evaluation.overall_score >= 50 %}bg-warning text-dark
             {% else %}bg-danger{% endif %}
           " style="font-size:0.8rem;">
-            {% if attempt.overall_score >= 70 %}Excellent
-            {% elif attempt.overall_score >= 50 %}Needs Improvement
+            {% if evaluation.overall_score >= 70 %}Excellent
+            {% elif evaluation.overall_score >= 50 %}Needs Improvement
             {% else %}Needs Work{% endif %}
           </span>
         </div>
@@ -173,13 +120,14 @@ pre.exec-output {
         {{ attempt.problem.title }}
       </h1>
       <p class="text-white-50 mb-3 small">
-        Submitted {{ attempt.created_at|date:"F j, Y \a\t g:i A" }}
+        Submitted {{ attempt.submitted_at|date:"F j, Y \a\t g:i A" }}
+        &bull; Status: <strong class="text-white">{{ attempt.get_status_display }}</strong>
       </p>
       <div class="d-flex flex-wrap gap-2">
-        <a href="{% url 'attempt-submit' attempt.problem.pk %}" class="btn btn-danger rounded-pill px-4">
+        <a href="{% url 'attempts:submit' slug=attempt.problem.slug %}" class="btn btn-danger rounded-pill px-4">
           <i class="bi bi-arrow-repeat me-1"></i>Try Again
         </a>
-        <a href="{% url 'attempt-history' %}" class="btn btn-outline-light rounded-pill px-4">
+        <a href="{% url 'attempts:history' %}" class="btn btn-outline-light rounded-pill px-4">
           <i class="bi bi-clock-history me-1"></i>View History
         </a>
       </div>
@@ -189,7 +137,7 @@ pre.exec-output {
 </div>
 
 
-<!-- ── Score Breakdown Cards ── -->
+<!-- Score Breakdown Cards -->
 <div class="row g-4 mb-4">
 
   <!-- Code Tests -->
@@ -198,37 +146,37 @@ pre.exec-output {
       <div class="card-header" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
         <div class="d-flex align-items-center gap-2">
           <span class="text-warning fs-5"><i class="bi bi-terminal-fill"></i></span>
-          <h6 class="text-white mb-0 fw-bold">Code Tests</h6>
+          <h6 class="text-white mb-0 fw-bold">Code Tests (Deterministic)</h6>
         </div>
       </div>
       <div class="card-body p-4">
         <div class="d-flex align-items-end gap-3 mb-3">
           <div class="fs-1 fw-bold
-            {% if attempt.code_score >= 28 %}text-success
-            {% elif attempt.code_score >= 20 %}text-warning
+            {% if evaluation.code_score >= 28 %}text-success
+            {% elif evaluation.code_score >= 20 %}text-warning
             {% else %}text-danger{% endif %}
           ">
-            {{ attempt.code_score }}<span class="fs-5 text-muted fw-normal">/40</span>
+            {{ evaluation.code_score }}<span class="fs-5 text-muted fw-normal">/40</span>
           </div>
           <div class="text-muted small mb-2">
-            {{ attempt.tests_passed }}/{{ attempt.tests_total }} tests passed
+            {{ evaluation.test_cases_passed }}/{{ evaluation.test_cases_total }} tests passed
           </div>
         </div>
         <div class="progress" style="height:10px;border-radius:20px;">
           <div
             class="progress-bar
-              {% if attempt.code_score >= 28 %}bg-success
-              {% elif attempt.code_score >= 20 %}bg-warning
+              {% if evaluation.code_score >= 28 %}bg-success
+              {% elif evaluation.code_score >= 20 %}bg-warning
               {% else %}bg-danger{% endif %}"
             role="progressbar"
-            style="width: {% widthratio attempt.code_score 40 100 %}%"
-            aria-valuenow="{{ attempt.code_score }}"
+            style="width: {% if evaluation.test_cases_total %}{{ evaluation.pass_rate }}{% else %}0{% endif %}%"
+            aria-valuenow="{{ evaluation.code_score }}"
             aria-valuemin="0"
             aria-valuemax="40"
           ></div>
         </div>
         <p class="text-muted small mt-2 mb-0">
-          {% widthratio attempt.code_score 40 100 %}% of code points earned
+          {{ evaluation.pass_rate }}% test pass rate
         </p>
       </div>
     </div>
@@ -240,37 +188,34 @@ pre.exec-output {
       <div class="card-header" style="background: linear-gradient(135deg,#4c1d95,#1e1b4b);">
         <div class="d-flex align-items-center gap-2">
           <span class="text-purple fs-5" style="color:#a78bfa;"><i class="bi bi-stars"></i></span>
-          <h6 class="text-white mb-0 fw-bold">AI Design Score</h6>
+          <h6 class="text-white mb-0 fw-bold">AI Design Score (Rubric)</h6>
         </div>
       </div>
       <div class="card-body p-4">
         <div class="d-flex align-items-end gap-3 mb-3">
           <div class="fs-1 fw-bold
-            {% if attempt.design_score >= 42 %}text-success
-            {% elif attempt.design_score >= 30 %}text-warning
+            {% if evaluation.ai_score >= 42 %}text-success
+            {% elif evaluation.ai_score >= 30 %}text-warning
             {% else %}text-danger{% endif %}
           ">
-            {{ attempt.design_score }}<span class="fs-5 text-muted fw-normal">/60</span>
+            {{ evaluation.ai_score }}<span class="fs-5 text-muted fw-normal">/60</span>
           </div>
           <div class="text-muted small mb-2">
-            Rubric-based AI evaluation
+            7 Criteria &bull; Evaluated by Gemini AI
           </div>
         </div>
         <div class="progress" style="height:10px;border-radius:20px;">
           <div
-            class="progress-bar
-              {% if attempt.design_score >= 42 %}bg-success
-              {% elif attempt.design_score >= 30 %}bg-warning
-              {% else %}bg-danger{% endif %}"
-            style="background: linear-gradient(90deg,#7c3aed,#a855f7) !important; width: {% widthratio attempt.design_score 60 100 %}%;"
+            class="progress-bar"
+            style="background: linear-gradient(90deg,#7c3aed,#a855f7) !important; width: {% widthratio evaluation.ai_score 60 100 %}%;"
             role="progressbar"
-            aria-valuenow="{{ attempt.design_score }}"
+            aria-valuenow="{{ evaluation.ai_score }}"
             aria-valuemin="0"
             aria-valuemax="60"
           ></div>
         </div>
         <p class="text-muted small mt-2 mb-0">
-          {% widthratio attempt.design_score 60 100 %}% of design points earned
+          {% widthratio evaluation.ai_score 60 100 %}% of design points earned
         </p>
       </div>
     </div>
@@ -279,52 +224,56 @@ pre.exec-output {
 </div>
 
 
-<!-- ── Rubric Table ── -->
-{% if rubric_results %}
+<!-- AI Summary -->
+{% if evaluation.ai_feedback.summary %}
+<div class="card ai-summary-card shadow-sm mb-4">
+  <div class="card-body p-4">
+    <h5 class="fw-bold mb-2">
+      <i class="bi bi-stars me-2" style="color:#a855f7;"></i>AI Design Feedback Summary
+    </h5>
+    <p class="mb-0" style="line-height:1.75;font-size:0.95rem;color:#374151;">
+      {{ evaluation.ai_feedback.summary }}
+    </p>
+  </div>
+</div>
+{% endif %}
+
+
+<!-- Rubric Table -->
+{% if evaluation.ai_feedback.criteria %}
 <div class="card shadow-sm mb-4" style="border-radius:14px;">
   <div class="card-body p-4">
     <h5 class="fw-bold mb-1">
       <i class="bi bi-table me-2 text-primary"></i>Design Rubric Breakdown
     </h5>
-    <p class="text-muted small mb-4">AI-evaluated criteria from your design document</p>
+    <p class="text-muted small mb-4">7 specific design dimensions evaluated against your submission</p>
 
     <div class="table-responsive">
       <table class="table table-hover rubric-table align-middle">
         <thead class="table-light">
           <tr>
             <th>Criterion</th>
-            <th style="width:120px;">Score</th>
+            <th style="width:110px;">Score</th>
             <th>Evidence</th>
             <th>Concern</th>
             <th>Suggestion</th>
           </tr>
         </thead>
         <tbody>
-          {% for row in rubric_results %}
+          {% for row in evaluation.ai_feedback.criteria %}
           <tr>
             <td>
-              <span class="criterion-name">{{ row.criterion }}</span>
+              <span class="criterion-name">{{ row.name }}</span>
               <div class="text-muted" style="font-size:0.75rem;">Max: {{ row.max_score }} pts</div>
             </td>
             <td>
-              <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold
-                  {% if row.score >= row.max_score|add:'-1' %}text-success
-                  {% elif row.score >= row.max_score|floatformat:0|add:'-3' %}text-warning
-                  {% else %}text-danger{% endif %}
-                ">{{ row.score }}</span>
-                <div class="flex-grow-1">
-                  <div class="progress criterion-progress">
-                    <div
-                      class="progress-bar
-                        {% if row.pct >= 70 %}bg-success
-                        {% elif row.pct >= 40 %}bg-warning
-                        {% else %}bg-danger{% endif %}"
-                      style="width: {{ row.pct }}%"
-                    ></div>
-                  </div>
-                </div>
-              </div>
+              <span class="badge rounded-pill px-2 py-1
+                {% if row.score >= 8 %}bg-success
+                {% elif row.score >= 5 %}bg-warning text-dark
+                {% else %}bg-danger{% endif %}
+              " style="font-size:0.85rem;">
+                {{ row.score }} / {{ row.max_score }}
+              </span>
             </td>
             <td><span class="evidence-text">{{ row.evidence|default:"—" }}</span></td>
             <td>
@@ -345,27 +294,12 @@ pre.exec-output {
 {% endif %}
 
 
-<!-- ── AI Summary ── -->
-{% if attempt.ai_summary %}
-<div class="card ai-summary-card shadow-sm mb-4">
-  <div class="card-body p-4">
-    <h5 class="fw-bold mb-3">
-      <i class="bi bi-stars me-2" style="color:#a855f7;"></i>AI Design Feedback Summary
-    </h5>
-    <p class="mb-0" style="line-height:1.75;font-size:0.94rem;color:#374151;">
-      {{ attempt.ai_summary }}
-    </p>
-  </div>
-</div>
-{% endif %}
-
-
-<!-- ── Execution Output (Collapsible) ── -->
-{% if attempt.execution_output %}
+<!-- Execution Output (Collapsible) -->
+{% if evaluation.execution_output or evaluation.execution_error %}
 <div class="card shadow-sm mb-4" style="border-radius:14px;">
   <div class="card-body p-4">
     <h5 class="fw-bold mb-3">
-      <i class="bi bi-terminal me-2 text-success"></i>Execution Output
+      <i class="bi bi-terminal me-2 text-success"></i>Code Execution Logs
     </h5>
     <div class="accordion" id="outputAccordion">
       <div class="accordion-item border-0">
@@ -378,12 +312,19 @@ pre.exec-output {
             aria-expanded="false"
             aria-controls="execOutput"
           >
-            <i class="bi bi-caret-right-fill me-2"></i>Show stdout / test output
+            <i class="bi bi-caret-right-fill me-2"></i>Show stdout / stderr test output
           </button>
         </h2>
         <div id="execOutput" class="accordion-collapse collapse" data-bs-parent="#outputAccordion">
           <div class="accordion-body p-0 pt-2">
-            <pre class="exec-output mb-0"><code>{{ attempt.execution_output }}</code></pre>
+            {% if evaluation.execution_output %}
+            <pre class="exec-output mb-2"><code>{{ evaluation.execution_output }}</code></pre>
+            {% endif %}
+            {% if evaluation.execution_error %}
+            <div class="alert alert-danger mb-0 font-monospace small">
+              <strong>Errors:</strong><br>{{ evaluation.execution_error }}
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -393,22 +334,22 @@ pre.exec-output {
 {% endif %}
 
 
-<!-- ── Action Buttons ── -->
+<!-- Action Buttons -->
 <div class="d-flex flex-wrap gap-3 justify-content-center mt-2 mb-4">
   <a
-    href="{% url 'attempt-submit' attempt.problem.pk %}"
+    href="{% url 'attempts:submit' slug=attempt.problem.slug %}"
     class="btn btn-danger btn-lg rounded-pill px-5 fw-semibold"
   >
     <i class="bi bi-arrow-repeat me-2"></i>Try Again
   </a>
   <a
-    href="{% url 'problem-detail' attempt.problem.pk %}"
+    href="{% url 'problems:detail' slug=attempt.problem.slug %}"
     class="btn btn-outline-dark btn-lg rounded-pill px-5"
   >
     <i class="bi bi-arrow-left me-2"></i>Back to Problem
   </a>
   <a
-    href="{% url 'attempt-history' %}"
+    href="{% url 'attempts:history' %}"
     class="btn btn-outline-secondary btn-lg rounded-pill px-5"
   >
     <i class="bi bi-clock-history me-2"></i>View History

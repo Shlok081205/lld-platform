@@ -85,6 +85,13 @@ class CodeExecutor:
             PASS: test_name
             FAIL: test_name — reason
         """
+        forbidden = self._check_forbidden(user_code)
+        if forbidden:
+            return ExecutionResult(
+                blocked=True,
+                stderr=f'Submission blocked: forbidden usage of "{forbidden}".',
+            )
+
         combined = textwrap.dedent(f"""
 # === LEARNER CODE ===
 {user_code}

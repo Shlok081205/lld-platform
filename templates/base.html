@@ -136,7 +136,7 @@
     <div class="container">
 
       <!-- Brand -->
-      <a class="navbar-brand d-flex align-items-center gap-2" href="/problems/">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'problems:list' %}">
         <span class="bg-danger rounded-2 px-2 py-1 text-white fw-bold" style="font-size:0.8rem;">LLD</span>
         <span class="navbar-brand-text">Practice Platform</span>
       </a>
@@ -158,15 +158,15 @@
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'problem-list' %}active{% endif %}"
-               href="/problems/">
+            <a class="nav-link {% if request.resolver_match.app_name == 'problems' %}active{% endif %}"
+               href="{% url 'problems:list' %}">
               <i class="bi bi-code-square me-1"></i>Problems
             </a>
           </li>
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'attempt-history' %}active{% endif %}"
-               href="/attempts/history/">
+            <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}"
+               href="{% url 'attempts:history' %}">
               <i class="bi bi-clock-history me-1"></i>History
             </a>
           </li>
@@ -183,7 +183,7 @@
             </span>
           </li>
           <li class="nav-item">
-            <form method="post" action="/accounts/logout/" class="d-inline">
+            <form method="post" action="{% url 'logout' %}" class="d-inline">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-3">
                 <i class="bi bi-box-arrow-right me-1"></i>Logout
@@ -192,12 +192,12 @@
           </li>
           {% else %}
           <li class="nav-item me-2">
-            <a class="nav-link" href="/accounts/login/">
+            <a class="nav-link" href="{% url 'login' %}">
               <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-sm btn-danger rounded-pill px-3" href="/accounts/register/">
+            <a class="btn btn-sm btn-danger rounded-pill px-3" href="{% url 'register' %}">
               <i class="bi bi-person-plus me-1"></i>Register
             </a>
           </li>

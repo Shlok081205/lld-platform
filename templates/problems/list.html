@@ -63,14 +63,14 @@
 
 {% block content %}
 
-<!-- ── Hero ── -->
+<!-- Hero -->
 <div class="hero-section d-flex align-items-center justify-content-between flex-wrap gap-3">
   <div>
     <h1 class="fw-bold mb-1" style="font-size:2rem;">
       <i class="bi bi-cpu me-2 text-danger"></i>LLD Problems
     </h1>
     <p class="mb-0 text-white-50">
-      Practice low-level design with AI-powered evaluation &amp; instant feedback.
+      Practice low-level design with AI-powered evaluation and instant feedback.
     </p>
   </div>
   <div class="text-end">
@@ -79,30 +79,30 @@
   </div>
 </div>
 
-<!-- ── Difficulty Filter ── -->
+<!-- Difficulty Filter -->
 <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
   <span class="text-muted fw-semibold small text-uppercase">Filter:</span>
   <div class="btn-group difficulty-btn-group" role="group" aria-label="Difficulty filter">
     <a
-      href="{% url 'problem-list' %}"
+      href="{% url 'problems:list' %}"
       class="btn {% if not selected_difficulty %}btn-dark{% else %}btn-outline-secondary{% endif %}"
     >All</a>
     <a
-      href="{% url 'problem-list' %}?difficulty=easy"
-      class="btn {% if selected_difficulty == 'easy' %}btn-success{% else %}btn-outline-success{% endif %}"
+      href="{% url 'problems:list' %}?difficulty=Easy"
+      class="btn {% if selected_difficulty == 'Easy' %}btn-success{% else %}btn-outline-success{% endif %}"
     ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Easy</a>
     <a
-      href="{% url 'problem-list' %}?difficulty=medium"
-      class="btn {% if selected_difficulty == 'medium' %}btn-warning{% else %}btn-outline-warning{% endif %}"
+      href="{% url 'problems:list' %}?difficulty=Medium"
+      class="btn {% if selected_difficulty == 'Medium' %}btn-warning{% else %}btn-outline-warning{% endif %}"
     ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Medium</a>
     <a
-      href="{% url 'problem-list' %}?difficulty=hard"
-      class="btn {% if selected_difficulty == 'hard' %}btn-danger{% else %}btn-outline-danger{% endif %}"
+      href="{% url 'problems:list' %}?difficulty=Hard"
+      class="btn {% if selected_difficulty == 'Hard' %}btn-danger{% else %}btn-outline-danger{% endif %}"
     ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Hard</a>
   </div>
 </div>
 
-<!-- ── Problems Grid ── -->
+<!-- Problems Grid -->
 {% if problems %}
 <div class="row g-4">
   {% for problem in problems %}
@@ -132,8 +132,8 @@
         <!-- Tags -->
         {% if problem.tags %}
         <div class="d-flex flex-wrap gap-1">
-          {% for tag in problem.tags.all %}
-          <span class="tag-badge">{{ tag.name }}</span>
+          {% for tag in problem.get_tags_list %}
+          <span class="tag-badge">{{ tag }}</span>
           {% endfor %}
         </div>
         {% endif %}
@@ -142,10 +142,10 @@
         <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
           <span class="attempt-count">
             <i class="bi bi-lightning-charge me-1 text-warning"></i>
-            {{ problem.attempt_count|default:0 }} attempt{{ problem.attempt_count|pluralize }}
+            {{ problem.user_attempt_count|default:0 }} attempt{{ problem.user_attempt_count|pluralize }}
           </span>
           <a
-            href="{% url 'problem-detail' problem.pk %}"
+            href="{% url 'problems:detail' slug=problem.slug %}"
             class="btn btn-sm btn-dark rounded-pill px-3"
           >
             Start Practice <i class="bi bi-arrow-right ms-1"></i>
@@ -159,7 +159,7 @@
 </div>
 
 {% else %}
-<!-- ── Empty state ── -->
+<!-- Empty state -->
 <div class="text-center py-5 my-5">
   <div
     class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light mb-4"
@@ -171,7 +171,7 @@
   <p class="text-muted mb-4">
     {% if selected_difficulty %}
       No <strong>{{ selected_difficulty }}</strong> problems available yet.
-      <a href="{% url 'problem-list' %}">View all problems</a>
+      <a href="{% url 'problems:list' %}">View all problems</a>
     {% else %}
       No problems have been added to the platform yet.
     {% endif %}
