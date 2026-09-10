@@ -20,16 +20,16 @@ The platform is intentionally minimal-dependency and self-hostable. It runs on S
 
 ## Features
 
-- 🧩 **5 curated LLD problems** across Easy, Medium, and Hard difficulties
-- 📝 **Dual submission format** — text design document + Python code editor (CodeMirror)
-- 🤖 **AI-powered design evaluation** via Gemini 1.5 Flash with a structured 7-criterion rubric
-- ✅ **Deterministic code testing** — each problem ships with hidden pytest test cases
-- 📊 **Per-criterion rubric breakdown** with evidence, concerns, and improvement suggestions
-- 📈 **Attempt history** with score trends and problem-level filtering
-- 🔐 **User authentication** — register, login, logout
-- 🎨 **Beautiful Bootstrap 5 UI** with dark navbar, responsive cards, and CodeMirror Python editor
-- 🚫 **Security sandbox** — code executed with restricted builtins and timeout guard
-- 🔄 **Re-submission** — attempt any problem multiple times to improve
+- **5 curated LLD problems** across Easy, Medium, and Hard difficulties
+- **Dual submission format** — text design document + Python code editor (CodeMirror)
+- **AI-powered design evaluation** via Gemini 1.5 Flash with a structured 7-criterion rubric
+- **Deterministic code testing** — each problem ships with hidden test cases
+- **Per-criterion rubric breakdown** with evidence, concerns, and improvement suggestions
+- **Attempt history** with score tracking and problem-level filtering
+- **User authentication** — register, login, logout
+- **Clean Bootstrap 5 UI** with dark navigation, responsive cards, and CodeMirror Python editor
+- **Security sandbox** — code executed with subprocess isolation, timeout guards, and forbidden import filters
+- **Re-submission loop** — attempt any problem multiple times to track and improve design quality
 
 ---
 
