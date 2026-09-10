@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -81,7 +81,7 @@ LOGIN_REDIRECT_URL = '/problems/'
 LOGOUT_REDIRECT_URL = '/'
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-GEMINI_MODEL = 'gemini-1.5-flash'
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-3.6-flash')
 
 # Code execution limits
 CODE_EXECUTION_TIMEOUT = 10  # seconds

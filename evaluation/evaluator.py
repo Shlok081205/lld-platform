@@ -9,6 +9,15 @@ from .rubric import CRITERIA
 
 logger = logging.getLogger(__name__)
 
+# Preferred fallback models in order of priority
+CANDIDATE_MODELS = [
+    getattr(settings, 'GEMINI_MODEL', 'gemini-3.6-flash'),
+    'gemini-3.6-flash',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-flash-latest',
+]
+
 
 class AIEvaluator:
     """
@@ -18,7 +27,7 @@ class AIEvaluator:
 
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
-        self.model_name = settings.GEMINI_MODEL
+        self.model_name = getattr(settings, 'GEMINI_MODEL', 'gemini-3.6-flash')
 
     def _build_prompt(self, problem, attempt, exec_result) -> str:
         criteria_text = '\n'.join(
@@ -71,6 +80,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no explanation o
     def evaluate(self, problem, attempt, exec_result) -> dict:
         """
         Call Gemini API and return structured feedback dict.
+        Iterates over candidate models if a 404/deprecation occurs.
         Falls back to a default response if API call fails.
         """
         if not self.api_key:
@@ -80,24 +90,41 @@ Respond ONLY with valid JSON in this exact format (no markdown, no explanation o
         try:
             import google.generativeai as genai
             genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(self.model_name)
             prompt = self._build_prompt(problem, attempt, exec_result)
-            response = model.generate_content(prompt)
-            raw = response.text.strip()
 
-            # Strip markdown code fences if present
-            if raw.startswith('```'):
-                raw = raw.split('```')[1]
-                if raw.startswith('json'):
-                    raw = raw[4:]
-            feedback = json.loads(raw)
-            return feedback
+            # Deduplicate while preserving order
+            models_to_try = []
+            for m in CANDIDATE_MODELS:
+                if m not in models_to_try:
+                    models_to_try.append(m)
 
-        except json.JSONDecodeError as e:
-            logger.error('Failed to parse Gemini JSON response: %s', e)
-            return self._error_feedback('AI returned malformed JSON.')
+            last_error = None
+            for model_name in models_to_try:
+                try:
+                    logger.info('Attempting Gemini evaluation with model: %s', model_name)
+                    model = genai.GenerativeModel(model_name)
+                    response = model.generate_content(prompt)
+                    raw = response.text.strip()
+
+                    # Strip markdown code fences if present
+                    if raw.startswith('```'):
+                        raw = raw.split('```')[1]
+                        if raw.startswith('json'):
+                            raw = raw[4:]
+                    feedback = json.loads(raw)
+                    return feedback
+                except json.JSONDecodeError as json_err:
+                    logger.error('Failed to parse JSON response from %s: %s', model_name, json_err)
+                    return self._error_feedback('AI returned malformed JSON.')
+                except Exception as call_err:
+                    logger.warning('Model %s failed: %s', model_name, call_err)
+                    last_error = call_err
+                    continue
+
+            return self._error_feedback(f'All candidate models failed: {last_error}')
+
         except Exception as e:
-            logger.error('Gemini API call failed: %s', e)
+            logger.error('Gemini API setup failed: %s', e)
             return self._error_feedback(str(e))
 
     def _mock_feedback(self) -> dict:
