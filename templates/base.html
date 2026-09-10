@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}LLD Practice Platform{% endblock %}</title>
 
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <!-- Bootstrap 5 CSS -->
   <link
     rel="stylesheet"
@@ -25,98 +30,186 @@
 
   <style>
     :root {
-      --brand-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      --accent: #e94560;
-      --accent-soft: rgba(233, 69, 96, 0.12);
+      --bg-main: #f8fafc;
+      --surface: #ffffff;
+      --border-color: #e2e8f0;
+      --border-subtle: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --primary: #0f172a;
+      --primary-hover: #1e293b;
+      --accent: #2563eb;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
     }
 
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Navbar ── */
-    .navbar-brand-text {
+    /* Navbar */
+    .app-navbar {
+      background-color: #0f172a !important;
+      border-bottom: 1px solid #1e293b;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+
+    .navbar-brand-badge {
+      background-color: #2563eb;
+      color: #ffffff;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #e94560, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      letter-spacing: 0.5px;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      margin-right: 0.5rem;
     }
 
-    .navbar-dark-custom {
-      background: var(--brand-gradient) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    .navbar-brand-title {
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.2px;
     }
 
-    .navbar-dark-custom .nav-link {
-      color: rgba(255, 255, 255, 0.8) !important;
+    .app-navbar .nav-link {
+      color: #94a3b8 !important;
+      font-size: 0.88rem;
       font-weight: 500;
-      transition: color 0.2s;
-      padding: 0.4rem 0.9rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 6px;
+      transition: color 0.15s, background-color 0.15s;
     }
 
-    .navbar-dark-custom .nav-link:hover,
-    .navbar-dark-custom .nav-link.active {
-      color: #fff !important;
-      background: rgba(255, 255, 255, 0.1);
+    .app-navbar .nav-link:hover {
+      color: #f8fafc !important;
+      background-color: rgba(255, 255, 255, 0.05);
     }
 
-    .navbar-dark-custom .navbar-toggler {
-      border-color: rgba(255, 255, 255, 0.3);
+    .app-navbar .nav-link.active {
+      color: #ffffff !important;
+      background-color: #1e293b;
     }
 
-    /* ── Flash messages ── */
-    .flash-container {
-      position: sticky;
-      top: 66px;
-      z-index: 1040;
-    }
-
-    /* ── Main content ── */
+    /* Main Container */
     .main-content {
       flex: 1;
       padding-top: 2rem;
-      padding-bottom: 3rem;
+      padding-bottom: 3.5rem;
     }
 
-    /* ── Footer ── */
+    /* Cards */
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    }
+
+    .card-header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Standard Buttons */
+    .btn {
+      font-weight: 500;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      padding: 0.45rem 0.95rem;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .btn-primary, .btn-dark {
+      background-color: #0f172a;
+      border-color: #0f172a;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover, .btn-dark:hover {
+      background-color: #1e293b;
+      border-color: #1e293b;
+      color: #ffffff;
+    }
+
+    .btn-outline-secondary {
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+      color: var(--text-primary);
+    }
+
+    /* Badges */
+    .badge {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      border-radius: 4px;
+      padding: 0.3em 0.55em;
+    }
+
+    .badge-diff-easy {
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-diff-medium {
+      background-color: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-diff-hard {
+      background-color: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    /* Code & Pre */
+    code, pre {
+      font-family: var(--font-mono);
+    }
+
+    .CodeMirror {
+      height: 420px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Footer */
     footer {
-      background: var(--brand-gradient);
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.85rem;
+      background-color: #ffffff;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.8rem;
       padding: 1.25rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     footer a {
-      color: rgba(255, 255, 255, 0.9);
+      color: var(--text-secondary);
       text-decoration: none;
     }
 
     footer a:hover {
-      color: #fff;
-    }
-
-    /* ── Card defaults ── */
-    .card {
-      border: 1px solid rgba(0, 0, 0, 0.07);
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-      border-radius: 12px;
-    }
-
-    /* ── CodeMirror override ── */
-    .CodeMirror {
-      height: 420px;
-      border-radius: 8px;
-      font-size: 14px;
-      border: 1px solid #dee2e6;
+      color: var(--text-primary);
+      text-decoration: underline;
     }
 
     {% block extra_style %}{% endblock %}
@@ -125,19 +218,19 @@
 
 <body>
 
-  <!-- ═══════════════════════════  NAVBAR  ═══════════════════════════ -->
-  <nav class="navbar navbar-expand-lg navbar-dark-custom sticky-top">
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg app-navbar sticky-top">
     <div class="container">
 
       <!-- Brand -->
-      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'problems:list' %}">
-        <span class="bg-danger rounded-2 px-2 py-1 text-white fw-bold" style="font-size:0.8rem;">LLD</span>
-        <span class="navbar-brand-text">Practice Platform</span>
+      <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{% url 'problems:list' %}">
+        <span class="navbar-brand-badge">LLD</span>
+        <span class="navbar-brand-title">Practice Platform</span>
       </a>
 
-      <!-- Toggler -->
+      <!-- Mobile toggle -->
       <button
-        class="navbar-toggler"
+        class="navbar-toggler border-secondary"
         type="button"
         data-bs-toggle="collapse"
         data-bs-target="#mainNav"
@@ -148,9 +241,9 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Links -->
+      <!-- Navigation Links -->
       <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.app_name == 'problems' %}active{% endif %}"
                href="{% url 'problems:list' %}">
@@ -167,18 +260,18 @@
           {% endif %}
         </ul>
 
-        <!-- Auth -->
+        <!-- Authentication -->
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
           {% if user.is_authenticated %}
-          <li class="nav-item me-2">
-            <span class="text-white-50 small d-flex align-items-center gap-1">
-              <strong class="text-white">{{ user.username }}</strong>
+          <li class="nav-item me-3">
+            <span class="text-slate-400 small" style="color: #94a3b8; font-size: 0.85rem;">
+              User: <strong class="text-white">{{ user.username }}</strong>
             </span>
           </li>
           <li class="nav-item">
             <form method="post" action="{% url 'logout' %}" class="d-inline">
               {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-3">
+              <button type="submit" class="btn btn-sm btn-outline-secondary text-light border-secondary">
                 Logout
               </button>
             </form>
@@ -190,7 +283,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-sm btn-danger rounded-pill px-3" href="{% url 'register' %}">
+            <a class="btn btn-sm btn-primary bg-blue-600 border-0" style="background-color: #2563eb;" href="{% url 'register' %}">
               Register
             </a>
           </li>
@@ -200,54 +293,44 @@
 
     </div>
   </nav>
-  <!-- ════════════════════════  END NAVBAR  ════════════════════════ -->
 
-
-  <!-- ═══════════════════════  FLASH MESSAGES  ══════════════════════ -->
+  <!-- Flash Messages -->
   {% if messages %}
-  <div class="flash-container">
-    <div class="container mt-2">
-      {% for message in messages %}
-      <div
-        class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 shadow-sm"
-        role="alert"
-      >
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      {% endfor %}
+  <div class="container mt-3">
+    {% for message in messages %}
+    <div
+      class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border"
+      role="alert"
+    >
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endfor %}
   </div>
   {% endif %}
-  <!-- ════════════════════════  END MESSAGES  ════════════════════════ -->
 
-
-  <!-- ════════════════════════  MAIN CONTENT  ════════════════════════ -->
+  <!-- Main Content -->
   <main class="main-content">
     <div class="container">
       {% block content %}{% endblock %}
     </div>
   </main>
-  <!-- ══════════════════════  END MAIN CONTENT  ══════════════════════ -->
 
-
-  <!-- ═══════════════════════════  FOOTER  ═══════════════════════════ -->
+  <!-- Footer -->
   <footer>
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-      <span>
-        <strong>LLD Practice Platform</strong> &mdash; Built for CipherSchools Engineering Assignment
-      </span>
-      <div class="d-flex gap-3">
+      <div>
+        <span>LLD Practice Platform &mdash; CipherSchools Technical Assessment</span>
+      </div>
+      <div class="d-flex gap-4">
         <a href="{% url 'problems:list' %}">Problems</a>
         {% if user.is_authenticated %}
-        <a href="{% url 'attempts:history' %}">My History</a>
+        <a href="{% url 'attempts:history' %}">My Submissions</a>
         {% endif %}
-        <a href="/admin/">Admin</a>
+        <a href="/admin/">Django Admin</a>
       </div>
     </div>
   </footer>
-  <!-- ═════════════════════════  END FOOTER  ═════════════════════════ -->
-
 
   <!-- Bootstrap 5 JS Bundle -->
   <script

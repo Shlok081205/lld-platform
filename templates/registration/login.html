@@ -1,98 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Login — LLD Practice Platform{% endblock %}
+{% block title %}Sign In — LLD Practice Platform{% endblock %}
 
 {% block extra_style %}
-body {
-  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 60%, #16213e 100%) !important;
-  min-height: 100vh;
-}
-
-.main-content {
+.auth-wrapper {
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
 }
 
-.auth-card {
+.auth-box {
   width: 100%;
-  max-width: 420px;
-  border-radius: 20px !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
-  background: #fff;
-  overflow: hidden;
+  max-width: 380px;
 }
-
-.auth-card-header {
-  background: linear-gradient(135deg, #1a1a2e, #0f3460);
-  padding: 2rem 2rem 1.75rem;
-  text-align: center;
-}
-
-.auth-card-body { padding: 2rem; }
-
-.form-control {
-  border-radius: 10px;
-  padding: 0.65rem 1rem;
-  border: 1.5px solid #e9ecef;
-  font-size: 0.92rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-control:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-}
-
-.form-label {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #374151;
-  margin-bottom: 0.4rem;
-  display: block;
-}
-
-.btn-login {
-  background: linear-gradient(135deg, #1a1a2e, #0f3460);
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.75rem;
-  border-radius: 10px;
-  transition: opacity 0.2s, transform 0.1s;
-  width: 100%;
-}
-
-.btn-login:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
-.btn-login:active { transform: translateY(0); }
-
-.divider {
-  display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;
-}
-.divider::before, .divider::after {
-  content: ''; flex: 1; height: 1px; background: #e9ecef;
-}
-.divider span { font-size: 0.8rem; color: #9ca3af; white-space: nowrap; }
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 75vh;">
-  <div class="auth-card">
+<div class="auth-wrapper">
+  <div class="auth-box">
 
-    <!-- Card Header -->
-    <div class="auth-card-header">
-      <h4 class="text-white fw-bold mb-1">Welcome Back</h4>
-      <p class="text-white-50 small mb-0">Sign in to continue practicing LLD</p>
+    <div class="text-center mb-4">
+      <h1 class="h4 fw-bold text-dark mb-1">Sign In</h1>
+      <p class="text-secondary small mb-0">Access the LLD practice environment</p>
     </div>
 
-    <!-- Card Body -->
-    <div class="auth-card-body">
-
+    <div class="card p-4">
       {% if form.non_field_errors %}
-      <div class="alert alert-danger rounded-3 small" role="alert">
+      <div class="alert alert-danger p-2 small mb-3" role="alert">
         {% for error in form.non_field_errors %}{{ error }}{% endfor %}
       </div>
       {% endif %}
@@ -100,58 +35,52 @@ body {
       <form method="post">
         {% csrf_token %}
 
-        <!-- Username -->
         <div class="mb-3">
-          <label class="form-label" for="{{ form.username.id_for_label }}">
+          <label class="form-label small fw-medium text-secondary" for="{{ form.username.id_for_label }}">
             Username
           </label>
           <input
             type="text"
-            class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+            class="form-control form-control-sm {% if form.username.errors %}is-invalid{% endif %}"
             id="{{ form.username.id_for_label }}"
             name="{{ form.username.html_name }}"
             value="{{ form.username.value|default:'' }}"
-            placeholder="Enter your username"
             autofocus
+            required
           />
           {% if form.username.errors %}
-          <div class="invalid-feedback">{{ form.username.errors.as_text }}</div>
+          <div class="invalid-feedback small">{{ form.username.errors.as_text }}</div>
           {% endif %}
         </div>
 
-        <!-- Password -->
         <div class="mb-4">
-          <label class="form-label" for="{{ form.password.id_for_label }}">
+          <label class="form-label small fw-medium text-secondary" for="{{ form.password.id_for_label }}">
             Password
           </label>
           <input
             type="password"
-            class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+            class="form-control form-control-sm {% if form.password.errors %}is-invalid{% endif %}"
             id="{{ form.password.id_for_label }}"
             name="{{ form.password.html_name }}"
-            placeholder="Enter your password"
+            required
           />
           {% if form.password.errors %}
-          <div class="invalid-feedback">{{ form.password.errors.as_text }}</div>
+          <div class="invalid-feedback small">{{ form.password.errors.as_text }}</div>
           {% endif %}
         </div>
 
-        <!-- Submit -->
-        <button type="submit" class="btn-login btn mb-3">
-          Login
+        <button type="submit" class="btn btn-dark w-100 mb-2">
+          Sign In
         </button>
-
       </form>
-
-      <div class="divider"><span>New to the platform?</span></div>
-
-      <div class="text-center">
-        <a href="{% url 'register' %}" class="btn btn-outline-dark rounded-pill px-4 fw-semibold">
-          Create an Account
-        </a>
-      </div>
-
     </div>
+
+    <div class="card p-3 mt-3 text-center">
+      <span class="small text-secondary">
+        New learner? <a href="{% url 'register' %}" class="fw-medium text-decoration-none">Create an account</a>
+      </span>
+    </div>
+
   </div>
 </div>
 {% endblock %}

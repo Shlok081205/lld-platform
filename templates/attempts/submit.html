@@ -3,209 +3,165 @@
 {% block title %}Submit Solution: {{ problem.title }} — LLD Practice Platform{% endblock %}
 
 {% block extra_style %}
-.submit-hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-  border-radius: 16px;
-  padding: 1.75rem 2rem;
-  margin-bottom: 1.75rem;
-  color: white;
+.editor-header-bar {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.panel-card {
-  border-radius: 14px !important;
-  border: 1px solid rgba(0,0,0,0.08);
+.pane-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #ffffff;
   overflow: hidden;
   height: 100%;
 }
 
-.panel-card .card-header {
-  background: #f8f9fa;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  padding: 0.85rem 1.25rem;
+.pane-header {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.field-label {
+.pane-title {
+  font-size: 0.85rem;
   font-weight: 600;
-  font-size: 0.88rem;
-  color: #374151;
-  margin-bottom: 0.5rem;
-  display: block;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .design-textarea {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  height: 420px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  height: 440px;
   resize: vertical;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  padding: 0.85rem;
+  border-radius: 0;
+  border: none;
+  padding: 1rem;
 }
 
 .design-textarea:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15);
+  outline: none;
+  box-shadow: none;
 }
 
-.tip-box {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.8rem;
-  color: #166534;
-}
-
-.submit-btn {
-  background: linear-gradient(135deg, #e94560 0%, #c0392b 100%);
+.CodeMirror {
+  height: 440px;
+  border-radius: 0;
   border: none;
-  color: white;
-  font-weight: 700;
-  font-size: 1.05rem;
-  padding: 0.85rem 2rem;
-  border-radius: 50px;
-  box-shadow: 0 4px 18px rgba(233, 69, 96, 0.35);
-  transition: all 0.2s;
 }
 
-.submit-btn:hover {
-  background: linear-gradient(135deg, #d63031 0%, #a71d2a 100%);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(233, 69, 96, 0.45);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
+.editor-footer-hint {
+  background-color: #f8fafc;
+  border-top: 1px solid var(--border-color);
+  padding: 0.65rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 {% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<div class="submit-hero d-flex align-items-center justify-content-between flex-wrap gap-3">
+<!-- Header & Breadcrumbs -->
+<div class="editor-header-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
   <div>
     <nav aria-label="breadcrumb">
-      <ol class="breadcrumb mb-1" style="--bs-breadcrumb-divider-color: rgba(255,255,255,0.4);">
-        <li class="breadcrumb-item">
-          <a href="{% url 'problems:list' %}" class="text-white-50 text-decoration-none">Problems</a>
-        </li>
-        <li class="breadcrumb-item">
-          <a href="{% url 'problems:detail' slug=problem.slug %}" class="text-white-50 text-decoration-none">
-            {{ problem.title|truncatechars:30 }}
-          </a>
-        </li>
-        <li class="breadcrumb-item active text-white" aria-current="page">Submit</li>
+      <ol class="breadcrumb small mb-1">
+        <li class="breadcrumb-item"><a href="{% url 'problems:list' %}" class="text-secondary text-decoration-none">Problems</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'problems:detail' slug=problem.slug %}" class="text-secondary text-decoration-none">{{ problem.title }}</a></li>
+        <li class="breadcrumb-item active text-dark" aria-current="page">Submit Solution</li>
       </ol>
     </nav>
-    <h1 class="fw-bold text-white mb-0" style="font-size:1.5rem;">
-      {{ problem.title }}
-    </h1>
+    <h1 class="h4 fw-bold mb-0">{{ problem.title }}</h1>
   </div>
-  <span
-    class="badge fs-6 fw-semibold px-3 py-2"
-    style="background: rgba(255,255,255,0.15); border-radius: 20px;"
-  >
-    100 pts total
-  </span>
-</div>
-
-<!-- Warning -->
-<div class="alert alert-warning rounded-3 mb-4" role="alert">
-  <strong>Both fields are required.</strong>
-  Provide your architectural design thoughts on the left, and runnable Python class implementation on the right.
+  <div class="d-flex align-items-center gap-2">
+    <span class="badge bg-light text-secondary border">Total Score: 100 pts</span>
+    <span class="badge 
+      {% if problem.difficulty == 'Easy' %}badge-diff-easy
+      {% elif problem.difficulty == 'Medium' %}badge-diff-medium
+      {% else %}badge-diff-hard{% endif %}">
+      {{ problem.difficulty }}
+    </span>
+  </div>
 </div>
 
 <!-- Submission Form -->
 <form method="post" id="submissionForm">
   {% csrf_token %}
 
-  <div class="row g-4 mb-4">
+  <div class="row g-3 mb-4">
 
-    <!-- LEFT: Design Document -->
+    <!-- Left Pane: Design Document -->
     <div class="col-12 col-lg-6">
-      <div class="card panel-card shadow-sm">
-        <div class="card-header">
-          <div class="d-flex align-items-center justify-content-between">
-            <h6 class="mb-0 fw-bold">Design Document</h6>
-            <span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.7rem;">60 pts</span>
-          </div>
+      <div class="pane-card">
+        <div class="pane-header">
+          <span class="pane-title">1. Design Specification (60 pts)</span>
+          <span class="text-muted small">Evaluated by Gemini AI</span>
         </div>
-        <div class="card-body p-3">
-          <label class="field-label" for="text_design">
-            Architectural Rationale &amp; Class Hierarchy
-          </label>
-          <textarea
-            class="form-control design-textarea"
-            id="text_design"
-            name="text_design"
-            placeholder="Write your design document here. Include:
+        <textarea
+          class="form-control design-textarea"
+          id="text_design"
+          name="text_design"
+          placeholder="Document your architecture and design decisions:
 
-- Classes and their single responsibilities
-- Key design patterns used (e.g. Strategy, State, Observer, Factory)
-- Relationships between entities (inheritance vs composition)
-- SOLID principles applied and rationale
-- Assumptions and trade-offs considered
+1. Class Hierarchy & Responsibilities:
+   - Identify core classes, fields, and method contracts.
+   - Clarify separation of concerns (Single Responsibility Principle).
 
-Example:
-Class: ParkingLot
-  - Responsibility: Manages floors, spot allocation, and ticket lifecycle
-  - Relationships: ParkingLot has many ParkingFloors, each floor has many ParkingSpots
-  - Patterns: Strategy pattern for find_nearest_spot() algorithm
-..."
-            required
-          >{{ text_design|default:'' }}</textarea>
-          <div class="tip-box mt-2">
-            <strong>Tip:</strong> Describe your classes, relationships, patterns, and SOLID principles clearly. Evaluated by Gemini AI against 7 criteria.
-          </div>
+2. Design Patterns Applied:
+   - e.g. Strategy, State, Observer, Factory, or Repository patterns.
+   - Explain why the pattern was chosen over alternatives.
+
+3. Extensibility & SOLID Analysis:
+   - Explain how new behaviors can be added with minimal code modifications.
+   - Address decoupling and interfaces."
+          required
+        >{{ text_design|default:'' }}</textarea>
+        <div class="editor-footer-hint">
+          Provide complete architectural rationale to score across all 7 rubric criteria.
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Python Code Editor -->
+    <!-- Right Pane: Python Code -->
     <div class="col-12 col-lg-6">
-      <div class="card panel-card shadow-sm">
-        <div class="card-header">
-          <div class="d-flex align-items-center justify-content-between">
-            <h6 class="mb-0 fw-bold">Python Implementation</h6>
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-secondary bg-opacity-25 text-secondary" style="font-size:0.7rem;">40 pts</span>
-              <span class="badge bg-dark" style="font-size:0.68rem;">Python 3</span>
-            </div>
-          </div>
+      <div class="pane-card">
+        <div class="pane-header">
+          <span class="pane-title">2. Python Implementation (40 pts)</span>
+          <span class="text-muted small">Tested via Automated Unit Harness</span>
         </div>
-        <div class="card-body p-3">
-          <label class="field-label" for="code_editor">
-            Source Code
-          </label>
 
-          <!-- Hidden textarea that receives CodeMirror value on submit -->
-          <textarea id="code_hidden" name="code" style="display:none;">{{ code|default:'' }}</textarea>
+        <!-- Hidden input synced with CodeMirror -->
+        <textarea id="code_hidden" name="code" style="display:none;">{{ code|default:'' }}</textarea>
 
-          <!-- CodeMirror container -->
-          <div id="code_editor"></div>
+        <!-- CodeMirror Editor Container -->
+        <div id="code_editor"></div>
 
-          <div class="tip-box mt-2">
-            <strong>Tip:</strong> Your code will be executed against test cases. Include all classes and working methods. Standard library only.
-          </div>
+        <div class="editor-footer-hint">
+          Standard library only. Code is executed against 8 automated unit test assertions.
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Submit Button -->
-  <div class="row">
-    <div class="col-12 col-lg-6 offset-lg-3">
-      <div class="d-grid mb-3">
-        <button type="submit" class="submit-btn btn" id="submitBtn">
-          Submit for Evaluation
-        </button>
-      </div>
-      <p class="text-center text-muted small mb-0">
-        Evaluation takes 5–15 seconds. Please don't refresh the page.
-      </p>
+  <!-- Action Bar -->
+  <div class="card p-3 d-flex flex-row align-items-center justify-content-between flex-wrap gap-3">
+    <div class="text-muted small">
+      Evaluation runs unit tests and executes AI rubric synthesis synchronously (approx. 5–10s).
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'problems:detail' slug=problem.slug %}" class="btn btn-outline-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+        Submit Solution for Evaluation
+      </button>
     </div>
   </div>
 
@@ -215,14 +171,13 @@ Class: ParkingLot
 
 {% block extra_js %}
 <script>
-  // Initialize CodeMirror
+  // CodeMirror Initialization
   const cmEditor = CodeMirror(document.getElementById('code_editor'), {
     value: document.getElementById('code_hidden').value ||
-`# Write your Python implementation here
-from abc import ABC, abstractmethod
+`from abc import ABC, abstractmethod
 from typing import List, Dict, Optional
 
-# Add your classes below...
+# Define your classes, interfaces, and core logic below:
 `,
     mode: 'python',
     theme: 'dracula',
@@ -244,23 +199,23 @@ from typing import List, Dict, Optional
     }
   });
 
-  // Sync CodeMirror value to hidden textarea on submit
+  // Form Submission Validation & Sync
   document.getElementById('submissionForm').addEventListener('submit', function(e) {
     const code = cmEditor.getValue().trim();
     const designDoc = document.getElementById('text_design').value.trim();
 
     if (!code || !designDoc) {
       e.preventDefault();
-      alert('Both fields are required. Please fill in both the design document and the Python code.');
+      alert('Please provide both the design document and the Python code before submitting.');
       return;
     }
 
     document.getElementById('code_hidden').value = code;
 
-    // Show loading state
+    // Loading State
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Evaluating design & running tests...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Evaluating Submission...';
   });
 </script>
 {% endblock %}

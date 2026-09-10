@@ -1,254 +1,180 @@
 {% extends "base.html" %}
 
-{% block title %}Attempt History — LLD Practice Platform{% endblock %}
+{% block title %}Submission History — LLD Practice Platform{% endblock %}
 
 {% block extra_style %}
-.history-hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-  border-radius: 16px;
-  padding: 2.25rem 2rem;
-  margin-bottom: 2rem;
-  color: white;
+.history-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
-.stat-box {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  padding: 0.85rem 1.4rem;
-  text-align: center;
-  min-width: 110px;
-}
-
-.filter-card {
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
+.history-table {
+  font-size: 0.88rem;
 }
 
 .history-table th {
-  font-size: 0.8rem;
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 700;
-  color: #6b7280;
-  padding: 1rem 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .history-table td {
-  padding: 1rem 0.75rem;
+  padding: 0.85rem 1rem;
   vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.history-table tbody tr {
-  transition: background-color 0.15s;
-}
-
-.history-table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-.problem-link {
+.score-cell {
+  font-family: var(--font-mono);
   font-weight: 600;
-  color: #111827;
-  text-decoration: none;
-  font-size: 0.95rem;
-}
-
-.problem-link:hover {
-  color: #e94560;
-}
-
-.score-badge {
-  font-weight: 700;
-  border-radius: 20px;
-  padding: 0.3em 0.75em;
-  font-size: 0.82rem;
-  display: inline-block;
-}
-
-.score-high { background-color: #d1fae5; color: #065f46; }
-.score-mid  { background-color: #fef3c7; color: #92400e; }
-.score-low  { background-color: #fee2e2; color: #991b1b; }
-
-.status-badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.35em 0.8em;
-  border-radius: 20px;
 }
 {% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<div class="history-hero">
-  <div class="row align-items-center g-3">
-    <div class="col-12 col-md">
-      <h1 class="fw-bold text-white mb-1" style="font-size:1.75rem;">
-        My Attempt History
-      </h1>
-      <p class="text-white-50 mb-0">Track your LLD design improvements and test scores over time.</p>
-    </div>
-    <div class="col-12 col-md-auto">
-      <div class="d-flex gap-2">
-        <div class="stat-box">
-          <div class="fs-3 fw-bold text-white">{{ attempts|length }}</div>
-          <div class="text-white-50 small">Total Attempts</div>
-        </div>
-      </div>
-    </div>
+<!-- Header -->
+<div class="history-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Submission History</h1>
+    <p class="text-secondary small mb-0">
+      Record of all past LLD solution evaluations and score progressions.
+    </p>
+  </div>
+  <div>
+    <a href="{% url 'problems:list' %}" class="btn btn-dark">
+      Browse Problem Directory
+    </a>
   </div>
 </div>
 
 <!-- Filter Bar -->
-<div class="filter-card d-flex align-items-center gap-3 flex-wrap">
-  <span class="text-muted fw-semibold small text-uppercase">Filter by problem:</span>
-  <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
-    <select name="problem" class="form-select form-select-sm rounded-pill" style="width:auto;min-width:220px;" onchange="this.form.submit()">
-      <option value="">All Problems</option>
-      {% for prob in problems %}
-      <option value="{{ prob.slug }}"
-        {% if selected_problem == prob.slug %}selected{% endif %}
-      >{{ prob.title }}</option>
-      {% endfor %}
-    </select>
+<div class="card p-3 mb-4">
+  <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+    <div class="d-flex align-items-center gap-2">
+      <label for="problemFilter" class="small fw-medium text-secondary">Problem:</label>
+      <select id="problemFilter" name="problem" class="form-select form-select-sm" style="width: auto; min-width: 220px;" onchange="this.form.submit()">
+        <option value="">All Problems</option>
+        {% for prob in problems %}
+        <option value="{{ prob.slug }}"
+          {% if selected_problem == prob.slug %}selected{% endif %}
+        >{{ prob.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
     {% if selected_problem %}
-    <a href="{% url 'attempts:history' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-      Clear
+    <a href="{% url 'attempts:history' %}" class="btn btn-sm btn-outline-secondary">
+      Clear Filter
     </a>
     {% endif %}
+    <div class="ms-auto text-muted small">
+      Showing <strong>{{ attempts|length }}</strong> total record{{ attempts|length|pluralize }}
+    </div>
   </form>
-  <div class="ms-auto text-muted small">
-    Showing <strong>{{ attempts|length }}</strong> attempt{{ attempts|length|pluralize }}
-  </div>
 </div>
 
-<!-- Attempts Table -->
+<!-- History Data Table -->
 {% if attempts %}
-<div class="card shadow-sm" style="border-radius:14px;">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table history-table mb-0">
-        <thead class="table-light">
-          <tr>
-            <th class="ps-4">Problem</th>
-            <th>Date &amp; Time</th>
-            <th>Code Score</th>
-            <th>Design Score</th>
-            <th>Overall Score</th>
-            <th>Status</th>
-            <th class="pe-4 text-end">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for attempt in attempts %}
-          <tr>
-            <!-- Problem -->
-            <td class="ps-4">
-              <a href="{% url 'problems:detail' slug=attempt.problem.slug %}" class="problem-link">
-                {{ attempt.problem.title }}
-              </a>
-              <div class="mt-1">
-                <span class="badge rounded-pill
-                  {% if attempt.problem.difficulty == 'Easy' %}bg-success
-                  {% elif attempt.problem.difficulty == 'Medium' %}bg-warning text-dark
-                  {% else %}bg-danger{% endif %}
-                " style="font-size:0.65rem;">{{ attempt.problem.difficulty }}</span>
-              </div>
-            </td>
-
-            <!-- Date -->
-            <td>
-              <div class="fw-semibold">{{ attempt.submitted_at|date:"M j, Y" }}</div>
-              <div class="text-muted small">{{ attempt.submitted_at|date:"g:i A" }}</div>
-            </td>
-
-            <!-- Code Score -->
-            <td>
-              {% if attempt.evaluation %}
-              <span class="score-badge
-                {% if attempt.evaluation.code_score >= 28 %}score-high
-                {% elif attempt.evaluation.code_score >= 20 %}score-mid
-                {% else %}score-low{% endif %}
-              ">{{ attempt.evaluation.code_score }}/40</span>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-
-            <!-- Design Score -->
-            <td>
-              {% if attempt.evaluation %}
-              <span class="score-badge
-                {% if attempt.evaluation.ai_score >= 42 %}score-high
-                {% elif attempt.evaluation.ai_score >= 30 %}score-mid
-                {% else %}score-low{% endif %}
-              ">{{ attempt.evaluation.ai_score }}/60</span>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-
-            <!-- Overall Score -->
-            <td>
-              {% if attempt.score is not None %}
-              <span class="score-badge fs-6
-                {% if attempt.score >= 70 %}score-high
-                {% elif attempt.score >= 50 %}score-mid
-                {% else %}score-low{% endif %}
-              ">{{ attempt.score }}/100</span>
-              {% else %}
-              <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-
-            <!-- Status -->
-            <td>
-              <span class="status-badge
-                {% if attempt.status == 'COMPLETED' %}bg-success text-white
-                {% elif attempt.status == 'EVALUATING' %}bg-warning text-dark
-                {% elif attempt.status == 'FAILED' %}bg-danger text-white
-                {% else %}bg-secondary text-white{% endif %}
-              ">
-                {{ attempt.get_status_display }}
-              </span>
-            </td>
-
-            <!-- Action -->
-            <td class="pe-4 text-end">
-              <a
-                href="{% url 'attempts:result' pk=attempt.pk %}"
-                class="btn btn-sm btn-dark rounded-pill px-3"
-              >
-                View
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table history-table mb-0">
+      <thead>
+        <tr>
+          <th>Problem</th>
+          <th>Date &amp; Time</th>
+          <th>Code Score (40 pts)</th>
+          <th>Rubric Score (60 pts)</th>
+          <th>Total Score (100 pts)</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attempt in attempts %}
+        <tr>
+          <td>
+            <a href="{% url 'problems:detail' slug=attempt.problem.slug %}" class="fw-semibold text-dark text-decoration-none">
+              {{ attempt.problem.title }}
+            </a>
+            <span class="badge ms-1 
+              {% if attempt.problem.difficulty == 'Easy' %}badge-diff-easy
+              {% elif attempt.problem.difficulty == 'Medium' %}badge-diff-medium
+              {% else %}badge-diff-hard{% endif %}">
+              {{ attempt.problem.difficulty }}
+            </span>
+          </td>
+          <td class="text-secondary small">
+            {{ attempt.submitted_at|date:"M d, Y &bull; H:i" }}
+          </td>
+          <td class="score-cell">
+            {% if attempt.evaluation %}
+            {{ attempt.evaluation.code_score }}/40
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="score-cell">
+            {% if attempt.evaluation %}
+            {{ attempt.evaluation.ai_score }}/60
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if attempt.score is not None %}
+            <span class="score-cell fw-bold 
+              {% if attempt.score >= 70 %}text-success
+              {% elif attempt.score >= 50 %}text-warning
+              {% else %}text-danger{% endif %}">
+              {{ attempt.score }}/100
+            </span>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge 
+              {% if attempt.status == 'COMPLETED' %}bg-success
+              {% elif attempt.status == 'EVALUATING' %}bg-warning text-dark
+              {% elif attempt.status == 'SUBMITTED' %}bg-secondary
+              {% else %}bg-danger{% endif %}">
+              {{ attempt.status }}
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              href="{% url 'attempts:result' pk=attempt.pk %}"
+              class="btn btn-sm btn-outline-secondary py-1 px-3"
+            >
+              Report &rarr;
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
 {% else %}
-<!-- Empty state -->
-<div class="text-center py-5 my-4">
-  <h4 class="fw-bold text-dark mb-2">No attempts yet</h4>
-  <p class="text-muted mb-4">
+<!-- Empty State -->
+<div class="card p-5 text-center my-4">
+  <h5 class="fw-semibold text-dark mb-1">No submissions found</h5>
+  <p class="text-muted small mb-3">
     {% if selected_problem %}
-      No attempts for the selected problem.
-      <a href="{% url 'attempts:history' %}">View all attempts</a>
+      No submission records logged for the selected problem.
     {% else %}
-      You haven't submitted any attempts yet. Start practicing!
+      You have not submitted any solutions yet.
     {% endif %}
   </p>
-  <a href="{% url 'problems:list' %}" class="btn btn-dark rounded-pill px-5">
-    Browse Problems
-  </a>
+  <div>
+    <a href="{% url 'problems:list' %}" class="btn btn-sm btn-dark">Browse Problems</a>
+  </div>
 </div>
 {% endif %}
 

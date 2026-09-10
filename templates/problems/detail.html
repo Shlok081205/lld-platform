@@ -1,48 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}{{ problem.title }} — LLD Practice Platform{% endblock %}
+{% block title %}{{ problem.title }} — Specification & Requirements{% endblock %}
 
 {% block extra_style %}
-.problem-hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-  border-radius: 16px;
-  padding: 2.25rem 2rem;
-  margin-bottom: 2rem;
-  color: white;
+.spec-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
-.difficulty-pill {
-  font-size: 0.75rem;
-  padding: 0.35em 0.85em;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.badge-easy   { background-color: #198754 !important; }
-.badge-medium { background-color: #fd7e14 !important; }
-.badge-hard   { background-color: #dc3545 !important; }
-
-.section-card {
-  border-radius: 14px !important;
-  border: 1px solid rgba(0,0,0,0.08);
-}
-
-.sample-input {
-  background-color: #1a1a2e;
-  color: #a8b2d1;
-  border-radius: 10px;
+.code-hint-block {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
   padding: 1.25rem;
-  font-family: 'Consolas', 'Fira Code', monospace;
-  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   line-height: 1.6;
   white-space: pre-wrap;
+  border: 1px solid #1e293b;
 }
 
-.score-pill {
-  font-weight: 700;
-  font-size: 0.82rem;
-  padding: 0.25em 0.65em;
-  border-radius: 20px;
+.sidebar-meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+}
+
+.sidebar-meta-item:last-child {
+  border-bottom: none;
 }
 {% endblock %}
 
@@ -51,163 +40,169 @@
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb small">
-    <li class="breadcrumb-item"><a href="{% url 'problems:list' %}" class="text-decoration-none">Problems</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ problem.title }}</li>
+    <li class="breadcrumb-item"><a href="{% url 'problems:list' %}" class="text-secondary text-decoration-none">Problems</a></li>
+    <li class="breadcrumb-item active text-dark" aria-current="page">{{ problem.title }}</li>
   </ol>
 </nav>
 
-<!-- Hero -->
-<div class="problem-hero">
-  <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-    <div>
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <span class="badge difficulty-pill badge-{{ problem.difficulty|lower }}">
-          {{ problem.difficulty|capfirst }}
-        </span>
-        {% for tag in problem.get_tags_list %}
-        <span
-          class="badge"
-          style="background:rgba(255,255,255,0.15);font-size:0.72rem;border-radius:20px;"
-        >{{ tag }}</span>
-        {% endfor %}
-      </div>
-      <h1 class="fw-bold text-white mb-1" style="font-size:1.75rem;">{{ problem.title }}</h1>
-      <p class="text-white-50 mb-0 small">
-        {{ user_attempts|length }} past attempt{{ user_attempts|length|pluralize }} by you
-      </p>
+<!-- Specification Header -->
+<div class="spec-header d-flex align-items-start justify-content-between gap-3 flex-wrap">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span class="badge 
+        {% if problem.difficulty == 'Easy' %}badge-diff-easy
+        {% elif problem.difficulty == 'Medium' %}badge-diff-medium
+        {% else %}badge-diff-hard{% endif %}">
+        {{ problem.difficulty }} Difficulty
+      </span>
+      {% for tag in problem.get_tags_list %}
+      <span class="badge bg-light text-secondary border">{{ tag }}</span>
+      {% endfor %}
     </div>
+    <h1 class="h3 fw-bold mb-1">{{ problem.title }}</h1>
+    <p class="text-secondary small mb-0">
+      Design and code challenge &bull; Evaluated via unit tests and architectural rubric
+    </p>
+  </div>
+  <div>
     <a
       href="{% url 'attempts:submit' slug=problem.slug %}"
-      class="btn btn-danger btn-lg rounded-pill px-4 fw-semibold align-self-start"
+      class="btn btn-dark px-4"
     >
-      Start Attempt
+      Start Solution Attempt
     </a>
   </div>
 </div>
 
 <div class="row g-4">
 
-  <!-- LEFT: Main content -->
+  <!-- Main Specification Body -->
   <div class="col-12 col-lg-8">
 
-    <!-- Description -->
-    <div class="card section-card mb-4">
-      <div class="card-body p-4">
-        <h5 class="fw-bold mb-3 text-dark">Description</h5>
-        <p class="text-muted mb-0" style="line-height:1.75;font-size:0.95rem;">
-          {{ problem.description|linebreaksbr }}
-        </p>
+    <!-- Overview -->
+    <div class="card mb-4">
+      <div class="card-header">
+        Problem Statement
+      </div>
+      <div class="card-body p-4 text-secondary" style="line-height: 1.7; font-size: 0.92rem;">
+        {{ problem.description|linebreaksbr }}
       </div>
     </div>
 
     <!-- Requirements -->
-    <div class="card section-card mb-4">
-      <div class="card-body p-4">
-        <h5 class="fw-bold mb-3 text-dark">Requirements &amp; Constraints</h5>
-        <div class="text-muted" style="line-height:1.75;font-size:0.95rem;">
-          {{ problem.requirements|linebreaksbr }}
-        </div>
+    <div class="card mb-4">
+      <div class="card-header">
+        System Requirements &amp; Behavioral Contracts
+      </div>
+      <div class="card-body p-4 text-secondary" style="line-height: 1.7; font-size: 0.92rem;">
+        {{ problem.requirements|linebreaksbr }}
       </div>
     </div>
 
-    <!-- Sample Input -->
+    <!-- Interface Hint / Sample Usage -->
     {% if problem.sample_input %}
-    <div class="card section-card mb-4">
-      <div class="card-body p-4">
-        <h5 class="fw-bold mb-3 text-dark">Sample Usage / Interface Hint</h5>
-        <pre class="sample-input mb-0"><code>{{ problem.sample_input }}</code></pre>
+    <div class="card mb-4">
+      <div class="card-header">
+        Expected Interface / Usage Sample
+      </div>
+      <div class="card-body p-3">
+        <pre class="code-hint-block mb-0"><code>{{ problem.sample_input }}</code></pre>
       </div>
     </div>
     {% endif %}
 
-    <!-- Start CTA bottom -->
-    <div class="d-grid">
+    <!-- Bottom Action -->
+    <div class="d-flex justify-content-end mb-4">
       <a
         href="{% url 'attempts:submit' slug=problem.slug %}"
-        class="btn btn-dark btn-lg rounded-3 fw-semibold"
+        class="btn btn-dark px-4"
       >
-        Start Attempt
+        Proceed to Submission Editor &rarr;
       </a>
     </div>
 
   </div>
-  <!-- END LEFT -->
 
-  <!-- RIGHT: Sidebar -->
+  <!-- Sidebar -->
   <div class="col-12 col-lg-4">
 
-    <!-- Stats card -->
-    <div class="card section-card mb-4">
-      <div class="card-body p-3">
-        <h6 class="fw-bold text-muted text-uppercase small mb-3">Problem Info</h6>
-        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-          <span class="small text-muted">Difficulty</span>
-          <span class="badge badge-{{ problem.difficulty|lower }} difficulty-pill">
-            {{ problem.difficulty|capfirst }}
-          </span>
+    <!-- Meta Details -->
+    <div class="card mb-4">
+      <div class="card-header">
+        Evaluation Overview
+      </div>
+      <div class="card-body px-3 py-2">
+        <div class="sidebar-meta-item">
+          <span class="text-muted">Complexity</span>
+          <span class="fw-medium text-dark">{{ problem.difficulty }}</span>
         </div>
-        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-          <span class="small text-muted">Evaluation Format</span>
-          <span class="small fw-semibold text-dark">Text Doc + Python</span>
+        <div class="sidebar-meta-item">
+          <span class="text-muted">Submission Mode</span>
+          <span class="fw-medium text-dark">Architecture Doc + Python</span>
         </div>
-        <div class="d-flex justify-content-between align-items-center py-2">
-          <span class="small text-muted">AI Evaluator</span>
-          <span class="small fw-semibold text-primary">Gemini 3.6 Flash</span>
+        <div class="sidebar-meta-item">
+          <span class="text-muted">Scoring Breakdown</span>
+          <span class="fw-medium text-dark">40 pts Code / 60 pts Rubric</span>
+        </div>
+        <div class="sidebar-meta-item">
+          <span class="text-muted">Test Harness</span>
+          <span class="fw-medium text-dark">8 Unit Assertions</span>
+        </div>
+        <div class="sidebar-meta-item">
+          <span class="text-muted">AI Reviewer</span>
+          <span class="fw-medium text-dark">Gemini 3.6 Flash</span>
         </div>
       </div>
     </div>
 
-    <!-- Recent Attempts -->
-    <div class="card section-card">
-      <div class="card-body p-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h6 class="fw-bold text-muted text-uppercase small mb-0">Your Recent Attempts</h6>
-          <a href="{% url 'attempts:history' %}?problem={{ problem.slug }}" class="small text-decoration-none">All</a>
-        </div>
-
+    <!-- User Attempts -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Your Previous Submissions</span>
+        <a href="{% url 'attempts:history' %}?problem={{ problem.slug }}" class="small text-decoration-none">View All</a>
+      </div>
+      <div class="card-body p-0">
         {% if user_attempts %}
         <div class="table-responsive">
-          <table class="table table-sm table-hover align-middle mb-0" style="font-size:0.83rem;">
-            <thead>
-              <tr class="text-muted">
-                <th>Date</th>
+          <table class="table table-hover align-middle mb-0" style="font-size: 0.83rem;">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Date</th>
                 <th>Score</th>
                 <th>Status</th>
-                <th></th>
+                <th class="pe-3 text-end">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for attempt in user_attempts %}
               <tr>
-                <td class="text-muted">{{ attempt.submitted_at|date:"M d, H:i" }}</td>
+                <td class="ps-3 text-secondary">{{ attempt.submitted_at|date:"M d, H:i" }}</td>
                 <td>
                   {% if attempt.score is not None %}
-                  <span
-                    class="score-pill
-                      {% if attempt.score >= 70 %}bg-success text-white
-                      {% elif attempt.score >= 50 %}bg-warning text-dark
-                      {% else %}bg-danger text-white{% endif %}"
-                  >{{ attempt.score }}/100</span>
+                  <span class="fw-semibold {% if attempt.score >= 70 %}text-success{% elif attempt.score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ attempt.score }}/100
+                  </span>
                   {% else %}
                   <span class="text-muted">—</span>
                   {% endif %}
                 </td>
                 <td>
-                  <span class="badge rounded-pill
+                  <span class="badge 
                     {% if attempt.status == 'COMPLETED' %}bg-success
                     {% elif attempt.status == 'EVALUATING' %}bg-warning text-dark
                     {% elif attempt.status == 'SUBMITTED' %}bg-secondary
-                    {% else %}bg-danger{% endif %}
-                  " style="font-size:0.7rem;">
-                    {{ attempt.status|capfirst }}
+                    {% else %}bg-danger{% endif %}">
+                    {{ attempt.status }}
                   </span>
                 </td>
-                <td class="text-end">
+                <td class="pe-3 text-end">
                   <a
                     href="{% url 'attempts:result' pk=attempt.pk %}"
-                    class="btn btn-outline-secondary rounded-pill px-2 py-0"
-                    style="font-size:0.75rem;"
-                  >View</a>
+                    class="btn btn-sm btn-outline-secondary py-0 px-2"
+                    style="font-size: 0.75rem;"
+                  >
+                    View
+                  </a>
                 </td>
               </tr>
               {% endfor %}
@@ -215,15 +210,15 @@
           </table>
         </div>
         {% else %}
-        <div class="text-center py-3">
-          <p class="text-muted small mb-0">No attempts yet. Give it a try!</p>
+        <div class="p-3 text-center text-muted small">
+          No attempts logged yet for this problem.
         </div>
         {% endif %}
       </div>
     </div>
 
   </div>
-  <!-- END SIDEBAR -->
 
 </div>
+
 {% endblock %}
