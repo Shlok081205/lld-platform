@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}LLD Problems — LLD Practice Platform{% endblock %}
+
+{% block extra_style %}
+.difficulty-btn-group .btn {
+  border-radius: 20px !important;
+  font-weight: 500;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+
+.problem-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.problem-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+.problem-card .card-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: none;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+.problem-card .card-header .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.75em;
+  border-radius: 20px;
+}
+
+.badge-easy   { background-color: #198754 !important; }
+.badge-medium { background-color: #fd7e14 !important; }
+.badge-hard   { background-color: #dc3545 !important; }
+
+.tag-badge {
+  font-size: 0.72rem;
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 20px;
+  padding: 0.2em 0.65em;
+}
+
+.attempt-count {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Hero ── -->
+<div class="hero-section d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="fw-bold mb-1" style="font-size:2rem;">
+      <i class="bi bi-cpu me-2 text-danger"></i>LLD Problems
+    </h1>
+    <p class="mb-0 text-white-50">
+      Practice low-level design with AI-powered evaluation &amp; instant feedback.
+    </p>
+  </div>
+  <div class="text-end">
+    <div class="fs-2 fw-bold text-white">{{ problems|length }}</div>
+    <div class="text-white-50 small">available problems</div>
+  </div>
+</div>
+
+<!-- ── Difficulty Filter ── -->
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+  <span class="text-muted fw-semibold small text-uppercase">Filter:</span>
+  <div class="btn-group difficulty-btn-group" role="group" aria-label="Difficulty filter">
+    <a
+      href="{% url 'problem-list' %}"
+      class="btn {% if not selected_difficulty %}btn-dark{% else %}btn-outline-secondary{% endif %}"
+    >All</a>
+    <a
+      href="{% url 'problem-list' %}?difficulty=easy"
+      class="btn {% if selected_difficulty == 'easy' %}btn-success{% else %}btn-outline-success{% endif %}"
+    ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Easy</a>
+    <a
+      href="{% url 'problem-list' %}?difficulty=medium"
+      class="btn {% if selected_difficulty == 'medium' %}btn-warning{% else %}btn-outline-warning{% endif %}"
+    ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Medium</a>
+    <a
+      href="{% url 'problem-list' %}?difficulty=hard"
+      class="btn {% if selected_difficulty == 'hard' %}btn-danger{% else %}btn-outline-danger{% endif %}"
+    ><i class="bi bi-circle-fill me-1" style="font-size:0.55rem;vertical-align:middle;"></i>Hard</a>
+  </div>
+</div>
+
+<!-- ── Problems Grid ── -->
+{% if problems %}
+<div class="row g-4">
+  {% for problem in problems %}
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card problem-card h-100 border-0 shadow-sm">
+
+      <!-- Card header with title + badge -->
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <h5 class="card-title text-white mb-0 fw-semibold" style="font-size:1rem; line-height:1.4;">
+            {{ problem.title }}
+          </h5>
+          <span class="badge badge-{{ problem.difficulty|lower }} flex-shrink-0">
+            {{ problem.difficulty|capfirst }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Card body -->
+      <div class="card-body d-flex flex-column gap-3">
+
+        <!-- Description preview -->
+        <p class="text-muted mb-0" style="font-size:0.88rem; line-height:1.55;">
+          {{ problem.description|truncatewords:22 }}
+        </p>
+
+        <!-- Tags -->
+        {% if problem.tags %}
+        <div class="d-flex flex-wrap gap-1">
+          {% for tag in problem.tags.all %}
+          <span class="tag-badge">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Attempt count + action -->
+        <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+          <span class="attempt-count">
+            <i class="bi bi-lightning-charge me-1 text-warning"></i>
+            {{ problem.attempt_count|default:0 }} attempt{{ problem.attempt_count|pluralize }}
+          </span>
+          <a
+            href="{% url 'problem-detail' problem.pk %}"
+            class="btn btn-sm btn-dark rounded-pill px-3"
+          >
+            Start Practice <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- ── Empty state ── -->
+<div class="text-center py-5 my-5">
+  <div
+    class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light mb-4"
+    style="width:90px;height:90px;"
+  >
+    <i class="bi bi-inbox text-muted" style="font-size:2.5rem;"></i>
+  </div>
+  <h4 class="fw-bold text-dark mb-2">No problems found</h4>
+  <p class="text-muted mb-4">
+    {% if selected_difficulty %}
+      No <strong>{{ selected_difficulty }}</strong> problems available yet.
+      <a href="{% url 'problem-list' %}">View all problems</a>
+    {% else %}
+      No problems have been added to the platform yet.
+    {% endif %}
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}

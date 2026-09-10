@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}My Attempt History — LLD Practice Platform{% endblock %}
+
+{% block extra_style %}
+.history-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.score-badge {
+  border-radius: 20px;
+  padding: 0.3em 0.8em;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.score-high   { background-color: rgba(25, 135, 84, 0.15);  color: #198754; border: 1px solid #198754; }
+.score-mid    { background-color: rgba(253, 126, 20, 0.15); color: #fd7e14; border: 1px solid #fd7e14; }
+.score-low    { background-color: rgba(220, 53, 69, 0.15);  color: #dc3545; border: 1px solid #dc3545; }
+
+.history-table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  font-weight: 700;
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.history-table td {
+  vertical-align: middle;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.history-table tr:hover td {
+  background: rgba(99,102,241,0.03);
+}
+
+.problem-link {
+  color: #1a1a2e;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.problem-link:hover {
+  color: #6366f1;
+}
+
+.status-badge {
+  border-radius: 20px;
+  padding: 0.25em 0.75em;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.filter-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.07);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 0.75rem 1.5rem;
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+
+.stat-box:last-child { border-right: none; }
+{% endblock %}
+
+{% block content %}
+
+<!-- ── History Hero ── -->
+<div class="history-hero">
+  <div class="row align-items-center g-3">
+    <div class="col">
+      <h1 class="fw-bold text-white mb-1" style="font-size:1.75rem;">
+        <i class="bi bi-clock-history me-2 text-danger"></i>My Attempt History
+      </h1>
+      <p class="text-white-50 mb-0 small">Track your progress and review past evaluations</p>
+    </div>
+    <div class="col-auto">
+      <div class="d-flex">
+        <div class="stat-box">
+          <div class="fs-3 fw-bold text-white">{{ total_attempts|default:0 }}</div>
+          <div class="text-white-50 small">Total</div>
+        </div>
+        <div class="stat-box">
+          <div class="fs-3 fw-bold text-success">{{ best_score|default:"—" }}</div>
+          <div class="text-white-50 small">Best Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="fs-3 fw-bold text-warning">{{ avg_score|default:"—" }}</div>
+          <div class="text-white-50 small">Avg Score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Filter Bar ── -->
+<div class="filter-card d-flex align-items-center gap-3 flex-wrap">
+  <span class="text-muted fw-semibold small text-uppercase">Filter by problem:</span>
+  <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
+    <select name="problem" class="form-select form-select-sm rounded-pill" style="width:auto;min-width:220px;" onchange="this.form.submit()">
+      <option value="">All Problems</option>
+      {% for problem in all_problems %}
+      <option value="{{ problem.pk }}"
+        {% if selected_problem == problem.pk|stringformat:"s" %}selected{% endif %}
+      >{{ problem.title }}</option>
+      {% endfor %}
+    </select>
+    {% if selected_problem %}
+    <a href="{% url 'attempt-history' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+      <i class="bi bi-x me-1"></i>Clear
+    </a>
+    {% endif %}
+  </form>
+  <div class="ms-auto text-muted small">
+    Showing <strong>{{ attempts|length }}</strong> attempt{{ attempts|length|pluralize }}
+  </div>
+</div>
+
+<!-- ── Attempts Table ── -->
+{% if attempts %}
+<div class="card shadow-sm" style="border-radius:14px;">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table history-table mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Problem</th>
+            <th>Date &amp; Time</th>
+            <th>Code Score</th>
+            <th>Design Score</th>
+            <th>Overall Score</th>
+            <th>Status</th>
+            <th class="pe-4 text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+          <tr>
+            <!-- Problem -->
+            <td class="ps-4">
+              <a href="{% url 'problem-detail' attempt.problem.pk %}" class="problem-link">
+                {{ attempt.problem.title }}
+              </a>
+              <div class="mt-1">
+                <span class="badge rounded-pill
+                  {% if attempt.problem.difficulty == 'easy' %}bg-success
+                  {% elif attempt.problem.difficulty == 'medium' %}bg-warning text-dark
+                  {% else %}bg-danger{% endif %}
+                " style="font-size:0.65rem;">{{ attempt.problem.difficulty|capfirst }}</span>
+              </div>
+            </td>
+
+            <!-- Date -->
+            <td>
+              <div class="fw-semibold">{{ attempt.created_at|date:"M j, Y" }}</div>
+              <div class="text-muted small">{{ attempt.created_at|date:"g:i A" }}</div>
+            </td>
+
+            <!-- Code Score -->
+            <td>
+              <span class="score-badge
+                {% if attempt.code_score >= 28 %}score-high
+                {% elif attempt.code_score >= 20 %}score-mid
+                {% else %}score-low{% endif %}
+              ">{{ attempt.code_score }}/40</span>
+            </td>
+
+            <!-- Design Score -->
+            <td>
+              <span class="score-badge
+                {% if attempt.design_score >= 42 %}score-high
+                {% elif attempt.design_score >= 30 %}score-mid
+                {% else %}score-low{% endif %}
+              ">{{ attempt.design_score }}/60</span>
+            </td>
+
+            <!-- Overall Score -->
+            <td>
+              <span class="score-badge fs-6
+                {% if attempt.overall_score >= 70 %}score-high
+                {% elif attempt.overall_score >= 50 %}score-mid
+                {% else %}score-low{% endif %}
+              ">{{ attempt.overall_score }}/100</span>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span class="status-badge
+                {% if attempt.status == 'completed' %}bg-success text-white
+                {% elif attempt.status == 'pending' %}bg-secondary text-white
+                {% elif attempt.status == 'failed' %}bg-danger text-white
+                {% else %}bg-light text-dark{% endif %}
+              ">
+                {% if attempt.status == 'completed' %}<i class="bi bi-check-circle me-1"></i>
+                {% elif attempt.status == 'pending' %}<i class="bi bi-hourglass-split me-1"></i>
+                {% else %}<i class="bi bi-x-circle me-1"></i>
+                {% endif %}
+                {{ attempt.status|capfirst }}
+              </span>
+            </td>
+
+            <!-- Action -->
+            <td class="pe-4 text-end">
+              <a
+                href="{% url 'attempt-result' attempt.pk %}"
+                class="btn btn-sm btn-dark rounded-pill px-3"
+              >
+                <i class="bi bi-eye me-1"></i>View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination (if applicable) -->
+{% if is_paginated %}
+<nav class="mt-4 d-flex justify-content-center" aria-label="Page navigation">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link rounded-start-pill" href="?page={{ page_obj.previous_page_number }}{% if selected_problem %}&problem={{ selected_problem }}{% endif %}">&laquo; Previous</a>
+    </li>
+    {% endif %}
+    <li class="page-item active">
+      <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    </li>
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link rounded-end-pill" href="?page={{ page_obj.next_page_number }}{% if selected_problem %}&problem={{ selected_problem }}{% endif %}">Next &raquo;</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<!-- ── Empty state ── -->
+<div class="text-center py-5 my-4">
+  <div
+    class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light mb-4"
+    style="width:100px;height:100px;"
+  >
+    <i class="bi bi-journal-x text-muted" style="font-size:2.75rem;"></i>
+  </div>
+  <h4 class="fw-bold text-dark mb-2">No attempts yet</h4>
+  <p class="text-muted mb-4">
+    {% if selected_problem %}
+      No attempts for the selected problem.
+      <a href="{% url 'attempt-history' %}">View all attempts</a>
+    {% else %}
+      You haven't submitted any attempts yet. Start practicing!
+    {% endif %}
+  </p>
+  <a href="{% url 'problem-list' %}" class="btn btn-dark rounded-pill px-5">
+    <i class="bi bi-arrow-right me-2"></i>Browse Problems
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Register — LLD Practice Platform{% endblock %}
+
+{% block extra_style %}
+body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 60%, #16213e 100%) !important;
+}
+
+.main-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
+  background: #fff;
+  overflow: hidden;
+}
+
+.auth-card-header {
+  background: linear-gradient(135deg, #4c1d95, #1e1b4b);
+  padding: 2rem 2rem 1.75rem;
+  text-align: center;
+}
+
+.auth-card-body { padding: 2rem; }
+
+.form-control {
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #e9ecef;
+  font-size: 0.92rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.help-text {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.35rem;
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #4c1d95, #7c3aed);
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  transition: opacity 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.btn-register:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
+.btn-register:active { transform: translateY(0); }
+
+.divider {
+  display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: #e9ecef;
+}
+.divider span { font-size: 0.8rem; color: #9ca3af; white-space: nowrap; }
+
+.password-req {
+  background: rgba(168,85,247,0.05);
+  border: 1px solid rgba(168,85,247,0.15);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+.password-req li { margin-bottom: 0.2rem; }
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="auth-card">
+
+    <!-- Card Header -->
+    <div class="auth-card-header">
+      <div class="d-flex justify-content-center mb-3">
+        <div class="rounded-3 p-3" style="background:rgba(168,85,247,0.3);">
+          <i class="bi bi-person-plus text-white" style="font-size:1.75rem;"></i>
+        </div>
+      </div>
+      <h4 class="text-white fw-bold mb-1">Create Account</h4>
+      <p class="text-white-50 small mb-0">Join and start practicing LLD today</p>
+    </div>
+
+    <!-- Card Body -->
+    <div class="auth-card-body">
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger rounded-3 small" role="alert">
+        <i class="bi bi-x-circle-fill me-2"></i>
+        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {% if field.name == 'username' %}<i class="bi bi-person me-1 text-muted"></i>
+            {% elif 'password' in field.name %}<i class="bi bi-lock me-1 text-muted"></i>
+            {% else %}<i class="bi bi-input-cursor-text me-1 text-muted"></i>
+            {% endif %}
+            {{ field.label }}
+          </label>
+          <input
+            type="{{ field.field.widget.input_type }}"
+            class="form-control {% if field.errors %}is-invalid{% endif %}"
+            id="{{ field.id_for_label }}"
+            name="{{ field.html_name }}"
+            {% if field.value %}value="{{ field.value }}"{% endif %}
+            placeholder="{{ field.label }}"
+            {% if forloop.first %}autofocus{% endif %}
+          />
+          {% if field.errors %}
+          <div class="invalid-feedback">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+          </div>
+          {% endif %}
+          {% if field.help_text %}
+          <div class="help-text">
+            {% if field.name == 'password1' %}
+            <ul class="password-req ps-3 mb-0 mt-1">
+              <li>At least 8 characters long</li>
+              <li>Cannot be too similar to your username</li>
+              <li>Cannot be entirely numeric</li>
+              <li>Cannot be a commonly used password</li>
+            </ul>
+            {% else %}
+            {{ field.help_text }}
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Submit -->
+        <button type="submit" class="btn-register btn mt-2 mb-3">
+          <i class="bi bi-person-check me-2"></i>Create Account
+        </button>
+
+      </form>
+
+      <div class="divider"><span>Already have an account?</span></div>
+
+      <div class="text-center">
+        <a href="/accounts/login/" class="btn btn-outline-dark rounded-pill px-4 fw-semibold">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Login Instead
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

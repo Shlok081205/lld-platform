@@ -1,0 +1,82 @@
+[
+    {
+        "model":  "problems.problem",
+        "pk":  1,
+        "fields":  {
+                       "title":  "Splitwise",
+                       "slug":  "splitwise",
+                       "description":  "Splitwise is a popular expense-sharing application that allows groups of people to track shared expenses and settle debts efficiently. At its core, the system must record who paid for what, split those costs among a configurable set of participants, and always be able to answer the question: who owes whom how much?\n\nThe real complexity lies in minimising the number of transactions required to settle all debts. A naive approach would produce one debt record per (payer, participant) pair, but a smart system can consolidate these into the minimum number of net transfers. For example, if A owes B Rs 200 and B owes C Rs 200, then A can pay C directly and the system stays balanced with just one transfer.\n\nYour implementation must support three split strategies: equal split (divide equally among all participants), exact split (each participant pays a specific amount), and percentage split (each participant contributes a given percentage). The system should enforce that exact amounts and percentages always sum to the correct total, raising a validation error otherwise.",
+                       "requirements":  "1. Model a User with id, name, and email.\n2. Model an Expense with amount, description, paid_by (User), and a list of ExpenseSplit objects.\n3. Implement three split types: EqualSplit, ExactSplit, PercentSplit Ã¢â‚¬â€ use the Strategy pattern.\n4. Validate that ExactSplit amounts sum to the expense total; PercentSplit percentages sum to 100.\n5. Maintain a running balance sheet: for every pair (A, B), store the net amount A owes B.\n6. Implement a simplify_debts() method that produces the minimum number of transactions to settle all balances.\n7. Provide a show_balances(user) method listing what the user owes and is owed.\n8. All monetary values must be rounded to two decimal places.\n9. No external libraries; use only the Python standard library.",
+                       "difficulty":  "Hard",
+                       "tags":  "Strategy Pattern,OOP,Graphs,Greedy",
+                       "sample_input":  "# Example usage\nfrom splitwise import SplitwiseService, User, Expense, EqualSplit\n\nsvc = SplitwiseService()\nalice = svc.add_user(\u0027Alice\u0027, \u0027alice@example.com\u0027)\nbob   = svc.add_user(\u0027Bob\u0027,   \u0027bob@example.com\u0027)\ncarol = svc.add_user(\u0027Carol\u0027, \u0027carol@example.com\u0027)\n\n# Alice pays Rs 300, split equally among all three\nexp = Expense(amount=300, description=\u0027Dinner\u0027, paid_by=alice)\nsvc.add_expense(exp, EqualSplit([alice, bob, carol]))\n\nsvc.show_balances(alice)\n# Alice gets back Rs 200 (100 each from Bob and Carol)\nsvc.simplify_debts()",
+                       "is_active":  true,
+                       "created_at":  "2026-09-10T12:00:00Z",
+                       "updated_at":  "2026-09-10T12:00:00Z"
+                   }
+    },
+    {
+        "model":  "problems.problem",
+        "pk":  2,
+        "fields":  {
+                       "title":  "Parking Lot",
+                       "slug":  "parking-lot",
+                       "description":  "Design and implement a multi-level parking lot management system. A real-world parking facility has multiple floors, each containing a fixed number of spots of different sizes: compact, large, and motorcycle. The system must efficiently assign the nearest available spot to an incoming vehicle based on its type, issue a parking ticket, compute the parking fee when the vehicle leaves, and update spot availability in real time.\n\nThe design should be extensible so that new vehicle types or pricing strategies can be added without rewriting core logic. Consider how you would model the relationship between vehicles, spots, tickets, and floors. The system should prevent double-booking, handle edge cases such as a full lot gracefully, and support a display board that shows live availability per floor.\n\nPay close attention to encapsulation: a ParkingLot should not expose raw spot arrays to callers. Instead, all interactions should go through well-defined methods, keeping internal state consistent.",
+                       "requirements":  "1. Model ParkingLot, ParkingFloor, ParkingSpot, Vehicle, ParkingTicket, and ParkingDisplayBoard classes.\n2. Support three vehicle types: Motorcycle, Car, Truck Ã¢â‚¬â€ each can only park in compatible spot sizes.\n3. Implement a spot-finding strategy: assign the first available spot on the lowest floor.\n4. Issue a ParkingTicket on entry with vehicle info, spot, floor, and entry timestamp.\n5. On exit, calculate the fee using a configurable hourly rate per vehicle type.\n6. Update the DisplayBoard after every park/unpark operation.\n7. Raise a custom ParkingLotFullException when no compatible spot is available.\n8. Implement a get_availability_report() method returning spots free/total per floor.\n9. Thread-safety is not required, but avoid mutable default arguments.",
+                       "difficulty":  "Medium",
+                       "tags":  "OOP,Factory Pattern,Design Patterns",
+                       "sample_input":  "from parking_lot import ParkingLot, Car, Motorcycle\n\nlot = ParkingLot(num_floors=3, spots_per_floor={\u0027compact\u0027: 10, \u0027large\u0027: 5, \u0027motorcycle\u0027: 5})\n\nticket1 = lot.park(Car(plate=\u0027MH01AB1234\u0027))\nticket2 = lot.park(Motorcycle(plate=\u0027MH02CD5678\u0027))\n\nprint(lot.get_availability_report())\n\nfee = lot.unpark(ticket1)\nprint(f\u0027Fee for car: Rs {fee}\u0027)",
+                       "is_active":  true,
+                       "created_at":  "2026-09-10T12:00:00Z",
+                       "updated_at":  "2026-09-10T12:00:00Z"
+                   }
+    },
+    {
+        "model":  "problems.problem",
+        "pk":  3,
+        "fields":  {
+                       "title":  "Library Management System",
+                       "slug":  "library-management-system",
+                       "description":  "Design a Library Management System that handles the complete lifecycle of books within a public library: cataloguing books, registering members, issuing and returning books, tracking due dates, and computing fines for late returns.\n\nA library holds many copies of books (a Book has multiple BookItem instances, each with its own barcode). Members can borrow up to a configurable maximum number of books simultaneously. When a book is checked out, a Lending record is created that captures the member, the specific book copy, checkout date, and due date. On return, if the book is overdue, a fine is calculated per day of delay.\n\nThe system should also allow members to search the catalogue by title, author, ISBN, or subject category, and to place reservations on currently unavailable books. When a reserved book becomes available, the system should mark it as reserved so the next borrower in the queue gets first access.",
+                       "requirements":  "1. Model Book (title, author, ISBN, subject), BookItem (barcode, status), Member, Librarian, Lending, Reservation, and Fine.\n2. BookItem status must be one of: Available, Reserved, Loaned, Lost.\n3. Enforce a maximum borrow limit per member (default: 5 books).\n4. Checkout sets a due date 14 days from today; returning after due date incurs a fine of Rs 5 per day.\n5. Implement search_catalogue(query, field) supporting title, author, ISBN, subject.\n6. Implement reserve(member, book) and fulfil_reservation(book_item) for the reservation queue (FIFO).\n7. A Librarian can add/remove books and members; Members can only borrow/return/reserve.\n8. All dates must use Python\u0027s datetime.date (no third-party libraries).\n9. Provide a member_report(member) method listing current loans, reservations, and outstanding fines.",
+                       "difficulty":  "Medium",
+                       "tags":  "OOP,State Pattern,Queue,Design Patterns",
+                       "sample_input":  "from library import Library, Book, Member, Librarian\n\nlib = Library()\nlibrarian = Librarian(\u0027L001\u0027, \u0027Priya\u0027)\n\nbook = Book(isbn=\u0027978-0-13-468599-1\u0027, title=\u0027Clean Code\u0027, author=\u0027Robert C. Martin\u0027, subject=\u0027Software Engineering\u0027)\nlibrarian.add_book(lib, book, copies=3)\n\nmember = Member(\u0027M001\u0027, \u0027Rahul\u0027)\nlibrarian.register_member(lib, member)\n\nlending = member.checkout(lib, isbn=\u0027978-0-13-468599-1\u0027)\nprint(lending.due_date)\n\nmember.return_book(lib, lending)\nprint(lib.member_report(member))",
+                       "is_active":  true,
+                       "created_at":  "2026-09-10T12:00:00Z",
+                       "updated_at":  "2026-09-10T12:00:00Z"
+                   }
+    },
+    {
+        "model":  "problems.problem",
+        "pk":  4,
+        "fields":  {
+                       "title":  "Vending Machine",
+                       "slug":  "vending-machine",
+                       "description":  "Implement a Vending Machine that sells snacks and beverages. The machine has a fixed number of slots, each stocked with a particular product at a given price and quantity. A customer interacts with the machine by selecting a product, inserting coins or notes, and receiving the product plus any change.\n\nThe heart of this problem is correctly modelling the machine\u0027s state transitions using the State design pattern. At any moment the machine is in one of several states Ã¢â‚¬â€ Idle, ProductSelected, MoneyInserted, Dispensing Ã¢â‚¬â€ and only certain actions are valid in each state. For example, inserting money before selecting a product should be rejected, and selecting a product when the machine is already dispensing should have no effect.\n\nHandle edge cases: insufficient funds (ask for more money or allow cancellation), exact change not available (refund and apologise), and out-of-stock items. The machine must keep an accurate internal inventory and provide a restock(slot, quantity) method for the operator.",
+                       "requirements":  "1. Implement states: IdleState, ProductSelectedState, MoneyInsertedState, DispensingState using the State pattern.\n2. Model Product (name, price) and Slot (product, quantity).\n3. Support coin denominations: 1, 2, 5, 10 rupees; note denominations: 20, 50, 100 rupees.\n4. select_product(slot_id) transitions from Idle Ã¢â€ â€™ ProductSelected, or raises OutOfStockError.\n5. insert_money(amount) accumulates inserted amount in ProductSelected or MoneyInserted state.\n6. dispense() checks sufficient funds, deducts inventory, returns change, transitions back to Idle.\n7. cancel() refunds all inserted money and returns to Idle from any non-Idle state.\n8. restock(slot_id, quantity) and collect_money() are operator-only methods.\n9. Raise descriptive custom exceptions for invalid state transitions.",
+                       "difficulty":  "Easy",
+                       "tags":  "State Pattern,OOP,Design Patterns",
+                       "sample_input":  "from vending_machine import VendingMachine, Product\n\nvm = VendingMachine()\nvm.add_slot(slot_id=\u0027A1\u0027, product=Product(\u0027Lays\u0027, price=20), quantity=5)\nvm.add_slot(slot_id=\u0027A2\u0027, product=Product(\u0027Coke\u0027, price=35), quantity=3)\n\nvm.select_product(\u0027A1\u0027)   # -\u003e ProductSelected\nvm.insert_money(10)\nvm.insert_money(20)       # total Rs 30 \u003e Rs 20 price\nvm.dispense()             # dispenses Lays, returns Rs 10 change\n\nprint(vm.get_inventory())",
+                       "is_active":  true,
+                       "created_at":  "2026-09-10T12:00:00Z",
+                       "updated_at":  "2026-09-10T12:00:00Z"
+                   }
+    },
+    {
+        "model":  "problems.problem",
+        "pk":  5,
+        "fields":  {
+                       "title":  "Snake and Ladder",
+                       "slug":  "snake-and-ladder",
+                       "description":  "Design and implement a Snake and Ladder board game engine that can support two or more players on a configurable board. The classic game is played on a 10Ãƒâ€”10 grid numbered 1Ã¢â‚¬â€œ100. Players take turns rolling a six-sided die; if a player lands on the head of a snake, they slide down to the snake\u0027s tail, and if they land on the foot of a ladder, they climb up to the ladder\u0027s top. The first player to reach exactly square 100 wins.\n\nYour engine must be flexible: the board dimensions, number of snakes, and number of ladders should all be configurable at construction time. Snakes and ladders must not overlap, a snake\u0027s head must always be higher than its tail, and a ladder\u0027s bottom must always be lower than its top. The game should support an arbitrary number of human and/or AI (auto-rolling) players.\n\nFocus on clean separation of concerns: the Board should own the grid logic, the Game should manage turn order and win detection, the Dice should be injectable (so tests can use a deterministic fake), and Player should track position and move history.",
+                       "requirements":  "1. Model Board, Cell, Snake, Ladder, Dice, Player, and Game classes.\n2. Board is configurable: size NÃƒâ€”N, arbitrary snakes and ladders passed as dictionaries {head: tail} and {bottom: top}.\n3. Validate: snake head \u003e tail, ladder top \u003e bottom, no snake/ladder starts on square 1 or NÃ‚Â².\n4. Dice is injectable Ã¢â‚¬â€ accept a callable roll_fn defaulting to random.randint(1,6).\n5. Game.play_turn(player) rolls the dice, moves the player, applies snake/ladder, and checks for win.\n6. A player must land exactly on 100 (or NÃ‚Â²) to win; overshooting keeps them in place.\n7. Game.start() runs the full game loop until a winner is found, returning the winning Player.\n8. Maintain a move log per player: list of (roll, landing_square, event) tuples.\n9. Support at least 2 players; raise ValueError if fewer than 2 players are added.",
+                       "difficulty":  "Easy",
+                       "tags":  "OOP,Simulation,Design Patterns",
+                       "sample_input":  "from snake_ladder import Game, Board, Player, Dice\n\nboard = Board(\n    size=10,\n    snakes={17: 7, 54: 34, 62: 19, 98: 25},\n    ladders={4: 14, 9: 31, 20: 38, 51: 67, 72: 91}\n)\ndice = Dice(roll_fn=lambda: 6)  # deterministic for testing\n\ngame = Game(board, dice)\ngame.add_player(Player(\u0027Alice\u0027))\ngame.add_player(Player(\u0027Bob\u0027))\n\nwinner = game.start()\nprint(f\u0027Winner: {winner.name}\u0027)\nprint(winner.move_log)",
+                       "is_active":  true,
+                       "created_at":  "2026-09-10T12:00:00Z",
+                       "updated_at":  "2026-09-10T12:00:00Z"
+                   }
+    }
+]
